@@ -95,7 +95,8 @@ class _InicioState extends State<Inicio> {
                                               color: Colors.deepOrangeAccent,
                                             ),
                                             Text(
-                                              publicacao.loja.nome,
+                                              publicacao.loja.nome == null
+                                              ? "" : publicacao.loja.nome,
                                               style: TextStyle(
                                                 fontSize: 16,
                                               ),
@@ -118,7 +119,9 @@ class _InicioState extends State<Inicio> {
                                               color: Colors.deepOrangeAccent,
                                             ),
                                             Text(
-                                              publicacao.cliente.nome,
+                                              publicacao.cliente == null
+                                                  ? "nome" : publicacao.cliente.nome
+                                              ,
                                               style: TextStyle(
                                                 fontSize: 16,
                                               ),

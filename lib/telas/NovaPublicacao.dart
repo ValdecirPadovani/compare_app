@@ -206,7 +206,7 @@ class _NovaPublicacaoState extends State<NovaPublicacao> {
     publicacao.dataPublicacao = DateTime.now().toIso8601String();
     publicacao.image = "arroz.png";
     publicacao.loja = new Loja("10", _lojaController.text, "16 3987 4540", "Habib Jabali 1500");
-    publicacao.cliente = new Cliente("3", "Maria", "maria@gmail.com", "1010");
+    //publicacao.cliente = new Cliente("3", "Maria", "maria@gmail.com", "1010");
     publicacao.produto = new Produto("02", "Arroz tipo 1 5Kg");
 
     var helper = PublicacaoHelper();

@@ -7,8 +7,15 @@ class Cliente{
   //TipoCliente tipo;
   String senha;
 
+  Cliente();
 
-  Cliente(this._id, this._nome, this._email, this.senha);
+  Map<String, dynamic> toMap(){
+    Map<String, dynamic> map = {
+      "nome" : this.nome,
+      "email" : this.email
+    };
+    return map;
+  }
 
   String get id => _id;
 

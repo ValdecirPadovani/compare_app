@@ -2,10 +2,9 @@ import 'package:compareapp/Utils/ListPublicacao.dart';
 import 'package:compareapp/model/Publicacao.dart';
 import 'package:compareapp/telas/Destaques.dart';
 import 'package:compareapp/telas/Inicio.dart';
-import 'package:compareapp/telas/Login.dart';
 import 'package:compareapp/telas/NovaPublicacao.dart';
-import 'package:compareapp/telas/NovoCliente.dart';
 import 'package:compareapp/telas/Publicacoes.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 
@@ -77,6 +76,12 @@ class _HomeState extends State<Home> {
     );
   }
 
+  _deslogarUsuario() async{
+    FirebaseAuth auth = FirebaseAuth.instance;
+    await auth.signOut();
+    Navigator.pushReplacementNamed(context,"/login");
+  }
+
   Widget _myDrawer(){
     return Drawer(
       child: Column(
@@ -99,6 +104,9 @@ class _HomeState extends State<Home> {
                 "Minha conta",
                 style: TextStyle(fontSize: 20),
             ),
+            onTap: (){
+
+            },
           ),
           ListTile(
             leading: Icon(Icons.exit_to_app),
@@ -107,10 +115,7 @@ class _HomeState extends State<Home> {
               style: TextStyle(fontSize: 20),
             ),
             onTap: (){
-              Navigator.pushReplacement(context,
-                  MaterialPageRoute(
-                      builder: (context) => Login()
-                  ));
+              _deslogarUsuario();
             },
           )
         ],

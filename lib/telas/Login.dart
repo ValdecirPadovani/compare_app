@@ -1,4 +1,6 @@
+import 'package:compareapp/model/Cliente.dart';
 import 'package:compareapp/telas/NovoCliente.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 
@@ -13,6 +15,68 @@ class _LoginState extends State<Login> {
 
   TextEditingController _controllerEmail = TextEditingController();
   TextEditingController _controllerSenha = TextEditingController();
+  String _mensagemErro = "";
+
+  _validarCampos(){
+
+    String email = _controllerEmail.text;
+    String senha = _controllerSenha.text;
+
+    if(email.isNotEmpty && email.contains("@")){
+      if(senha.isNotEmpty && senha.length > 6){
+        setState(() {
+          _mensagemErro = "";
+        });
+        Cliente usuario = Cliente();
+        usuario.email = email;
+        usuario.senha = senha;
+
+        _logarUsuario(usuario);
+
+      }else{
+        setState(() {
+          _mensagemErro = "Digite a senha";
+        });
+      }
+    }else{
+      setState(() {
+        _mensagemErro = "Digite um e-mail válido";
+      });
+    }
+  }
+
+
+  Future _verificarUsuarioLogado() async{
+    FirebaseAuth auth = FirebaseAuth.instance;
+    //auth.signOut();
+    FirebaseUser usuarioLogado = await auth.currentUser();
+    if(usuarioLogado != null){
+      Navigator.pushReplacementNamed(context,"/home");
+    }
+  }
+
+  _logarUsuario(Cliente cliente) {
+    FirebaseAuth auth = FirebaseAuth.instance;
+    auth.signInWithEmailAndPassword(
+        email: cliente.email,
+        password: cliente.senha
+    ).then((firebase) {
+      Navigator.pushReplacementNamed(context,"/home");
+    }).catchError((error) {
+      print(error.toString());
+      print(cliente.email);
+      print(cliente.senha);
+      setState(() {
+        _mensagemErro = "Erro ao fazer login";
+      });
+    });
+  }
+
+  @override
+  void initState() {
+    _verificarUsuarioLogado();
+    super.initState();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -150,20 +214,5 @@ class _LoginState extends State<Login> {
         ),
       ),
     );
-  }
-
-  _validarCampos(){
-    String email = _controllerEmail.text;
-    String senha = _controllerSenha.text;
-    if(email.isNotEmpty && email.contains("valdecir@gmail.com")){
-      if(senha.isNotEmpty && senha.contains("123")){
-        setState(() {
-          Navigator.pushReplacement(context,
-              MaterialPageRoute(
-                  builder: (context) => Home()
-              ));
-        });
-      }
-    }
   }
 }
