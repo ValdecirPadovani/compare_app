@@ -23,8 +23,8 @@ class Publicacao{
     Map<String, dynamic> map ={
     "descricao" : this._descricao,
     "image" : this._image,
-    "lojaId" : this._loja.id,
-    "produtoId" : this._produto.id,
+    "lojaId" : this._loja.nome,
+    "produtoId" : this._produto.nome,
     "clienteId" :  this._cliente.id,
     "dataPublicacao" : this._dataPublicacao
     };

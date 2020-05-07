@@ -1,15 +1,15 @@
 import 'dart:io';
 
-import 'package:compareapp/Home.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:compareapp/model/Loja.dart';
 import 'package:compareapp/model/Publicacao.dart';
 import 'package:compareapp/model/Cliente.dart';
 import 'package:compareapp/model/Produto.dart';
-import 'package:compareapp/utils/PublicacaoHelper.dart';
-import 'package:flutter/cupertino.dart';
+import 'package:firebase_auth/firebase_auth.dart';
+import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:image_picker/image_picker.dart';
-import 'package:path_provider/path_provider.dart';
 
 
 class NovaPublicacao extends StatefulWidget {
@@ -23,29 +23,45 @@ class _NovaPublicacaoState extends State<NovaPublicacao> {
   TextEditingController _precoController = TextEditingController();
   TextEditingController _tituloController = TextEditingController();
   TextEditingController _lojaController = TextEditingController();
+  String _idUsuarioLogado = "";
+  File _imagem;
+  bool _subindoImagem;
+  String _urlRecuperada;
 
-  String _path = "";
-  String _nomeImg;
+  @override
+  void initState() {
+    _recuperarUsuarioLogado();
+    super.initState();
+  }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar:  AppBar(
-      backgroundColor: Colors.deepOrangeAccent,
-      title: Text("Nova publicação"),
+        backgroundColor: Colors.deepOrangeAccent,
+        title: Text("Nova publicação"),
       ),
       body: Container(
         child: Center(
           child: SingleChildScrollView(
             child: Column(
               children: <Widget>[
-                //Imagem
+               //Imagem
                Padding(
-                    padding: EdgeInsets.only(bottom: 0),
-                    child: Image.asset(
-                       _path,
-                      width: 200,
-                      height: 250,
+                 padding: EdgeInsets.all(3),
+                    child:Container(
+                      height: 170,
+                      width: 350,
+                      decoration: BoxDecoration(
+                        color: Colors.grey,
+                        image: DecorationImage(
+                            image:_urlRecuperada == null ?
+                            AssetImage("images/compare.png"):
+                            NetworkImage(_urlRecuperada ),
+                            fit: BoxFit.cover
+                        ),
+                        border: Border.all(color: Colors.redAccent)
+                      ),
                     ),
                   ),
                  Row(
@@ -61,7 +77,7 @@ class _NovaPublicacaoState extends State<NovaPublicacao> {
                           padding: EdgeInsets.only(bottom: 8),
                         ),
                         onPressed: (){
-                          _newPhoto("camera");
+                          _recuperarImagem("camera");
                         },
                       ),
                       FlatButton(
@@ -74,14 +90,14 @@ class _NovaPublicacaoState extends State<NovaPublicacao> {
                           padding: EdgeInsets.only(bottom: 8),
                         ),
                         onPressed: (){
-                          _newPhoto("galeria");
+                          _recuperarImagem("galeria");
                         },
                       ),
                     ],
                   ),
                 //Titulo
                 Padding(
-                  padding: EdgeInsets.only(bottom: 0),
+                  padding: EdgeInsets.only(bottom: 8),
                   child: TextField(
                     controller: _tituloController,
                     keyboardType: TextInputType.text,
@@ -101,11 +117,12 @@ class _NovaPublicacaoState extends State<NovaPublicacao> {
                 Padding(padding: EdgeInsets.only(bottom: 8),
                   child: TextField(
                     keyboardType: TextInputType.number,
+                    inputFormatters: <TextInputFormatter>[WhitelistingTextInputFormatter.digitsOnly],
                     controller: _precoController,
                     style: TextStyle(fontSize: 20),
                     decoration: InputDecoration(
                         contentPadding: EdgeInsets.fromLTRB(32, 16, 32, 12),
-                        hintText: "Preço",
+                        hintText: "Preço do produto",
                         labelText: "Preço",
                         filled: true,
                         border: OutlineInputBorder(
@@ -133,8 +150,9 @@ class _NovaPublicacaoState extends State<NovaPublicacao> {
                 ),
                 //Enviar - Cancelar
                 Padding(
-                    padding: EdgeInsets.only(bottom: 8, left: 60),
+                  padding: EdgeInsets.all(3),
                   child: Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
                     children: <Widget>[
                       RaisedButton(
                         child: Text(
@@ -147,18 +165,13 @@ class _NovaPublicacaoState extends State<NovaPublicacao> {
                             borderRadius: BorderRadius.circular(32)
                         ),
                         onPressed: (){
-                          _insetProd();
-                          /*
-                          Navigator.push(context,
-                              MaterialPageRoute(
-                                  builder: (context)=> Home()
-                              ));
-                           */
+                          _urlRecuperada == null ? _createDialog(context) : _salvarPublicacao();
                         },
                       ),
                       Padding(
-                        padding:EdgeInsets.only( left: 20),
-                        child: RaisedButton(
+                        padding: EdgeInsets.all(5),
+                      ),
+                      RaisedButton(
                           child: Text(
                             "Descartar",
                             style: TextStyle(
@@ -172,13 +185,9 @@ class _NovaPublicacaoState extends State<NovaPublicacao> {
                               borderRadius: BorderRadius.circular(32)
                           ),
                           onPressed: (){
-                            Navigator.push(context,
-                                MaterialPageRoute(
-                                    builder: (context)=> Home()
-                                ));
+                            Navigator.pushNamedAndRemoveUntil(context,"/home",(_)=>false);
                           },
                         ),
-                      )
                     ],
                   ),
                 )
@@ -190,63 +199,106 @@ class _NovaPublicacaoState extends State<NovaPublicacao> {
     );
   }
 
-  //Chamado após acionar o botão enviar
-  _insetProd() async{
+   _createDialog( BuildContext context){
+    return showDialog(context: context, builder: (context){
+        return AlertDialog(
+          title: Text("Selecione uma imagem"),
+          actions: <Widget>[
+            MaterialButton(
+              elevation: 6,
+              child: Text("OK"),
+              onPressed: (){
+                  Navigator.of(context).pop();
+              },
+            )
+          ],
 
-    if(_path.isEmpty){
-      AlertDialog(
-        title: Text(
-          "path VAZIO"
-        ),
-      );
-    }
+        );
+    });
+  }
+
+  _salvarPublicacao() async {
+
+    //adicionando o id do usuário
+    Cliente cliente = new Cliente();
+    cliente.id = _idUsuarioLogado;
 
     Publicacao publicacao = new Publicacao.empty();
     publicacao.descricao= _tituloController.text;
     publicacao.dataPublicacao = DateTime.now().toIso8601String();
-    publicacao.image = "arroz.png";
+    publicacao.image = _urlRecuperada;
     publicacao.loja = new Loja("10", _lojaController.text, "16 3987 4540", "Habib Jabali 1500");
-    //publicacao.cliente = new Cliente("3", "Maria", "maria@gmail.com", "1010");
+    publicacao.cliente = cliente;
     publicacao.produto = new Produto("02", "Arroz tipo 1 5Kg");
 
-    var helper = PublicacaoHelper();
-    var teste = await helper.salvarAnotacao(publicacao);
+    Firestore db = Firestore.instance;
+
+    await db.collection("publicacoes")
+        .document( _idUsuarioLogado )
+        .setData(publicacao.toMap());
+
+    Navigator.pushNamed(context, "/home");
   }
 
-  _newPhoto( String pathPhoto){
-    switch(pathPhoto){
-      case "camera":
-        getImageFromCam();
-        break;
+  _recuperarUrlImagem(StorageTaskSnapshot snapshot) async{
+    String url = await snapshot.ref.getDownloadURL();
+    setState(() {
+      _urlRecuperada = url;
+    });
+  }
 
+  _recuperarUsuarioLogado() async{
+    //pegando usuário logado no sistema
+    FirebaseAuth auth = FirebaseAuth.instance;
+    FirebaseUser usuarioLogado = await auth.currentUser();
+    setState(() {
+      _idUsuarioLogado = usuarioLogado.uid;
+    });
+  }
+
+  Future _uploadImagem(){
+    FirebaseStorage storage = FirebaseStorage.instance;
+    StorageReference pastaRaiz = storage.ref();
+    StorageReference arquivo = pastaRaiz.child("publicacoes").child(_idUsuarioLogado+".jpg");
+
+    //Progresso da imagem sendo enviada ao servidor
+    StorageUploadTask task = arquivo.putFile(_imagem);
+
+    task.events.listen((StorageTaskEvent storageEvent){
+      if(storageEvent.type == StorageTaskEventType.progress){
+        setState(() {
+          _subindoImagem = true;
+        });
+      }else if(storageEvent.type == StorageTaskEventType.success){
+        setState(() {
+          _subindoImagem = false;
+        });
+      }
+    });
+
+    //Recuperar imagem
+    task.onComplete.then((StorageTaskSnapshot snapshot){
+      _recuperarUrlImagem(snapshot);
+    });
+  }
+
+  Future _recuperarImagem(String origem) async{
+    File imagemSelecionada;
+    switch(origem){
+      case "camera":
+        imagemSelecionada = await ImagePicker.pickImage(source: ImageSource.camera);
+        break;
       case "galeria":
-        getImageFromGalery();
+        imagemSelecionada = await ImagePicker.pickImage(source: ImageSource.gallery);
         break;
     }
-  }
-
-  Future getImageFromCam() async{
-    var image = await ImagePicker.pickImage(source: ImageSource.camera);
-    var path = await getApplicationDocumentsDirectory();
-    File newImaeg = await image.copy(path.path+"/"+_nomeImg);
     setState(() {
-      _path = newImaeg.path;
+      _imagem = imagemSelecionada;
+      if(_imagem != null){
+        _subindoImagem = true;
+        _uploadImagem();
+      }
     });
-  }
-  Future getImageFromGalery() async{
-    var image = await ImagePicker.pickImage(source: ImageSource.gallery);
-    var path = await getApplicationDocumentsDirectory();
-    getIdPub();
-    File newImaeg = await image.copy(path.path+"/"+_nomeImg);
-    setState(() {
-      _path = newImaeg.path;
-    });
-  }
-
-  Future getIdPub() async{
-    var helper = PublicacaoHelper();
-    int qtyAnotacao  =  await helper.recuperarNumAnotacao();
-    _nomeImg = qtyAnotacao.toString() +".png";
   }
 
 }

@@ -1,12 +1,11 @@
 import 'package:compareapp/Home.dart';
 import 'package:compareapp/telas/Login.dart';
+import 'package:compareapp/telas/NovaPublicacao.dart';
 import 'package:flutter/material.dart';
 
 class RouterGenerator{
 
   static Route<dynamic> generateRoute(RouteSettings settings){
-
-    final args = settings.arguments;
 
     switch(settings.name){
 
@@ -20,11 +19,25 @@ class RouterGenerator{
           builder: (_) => Home()
         );
 
+      case "/inicio":
+        return MaterialPageRoute(
+          builder: (_) => Home()
+        );
+
       case "/login":
         return MaterialPageRoute(
           builder: (_) => Login()
         );
 
+      case "/novaPublicacao":
+        return MaterialPageRoute(
+          builder: (context) => NovaPublicacao(),
+        );
+
+      case "/publicacoes":
+        return MaterialPageRoute(
+          builder: (_) => Home()
+        );
 
       default:
         _erroRota();

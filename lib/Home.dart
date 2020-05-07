@@ -2,7 +2,6 @@ import 'package:compareapp/Utils/ListPublicacao.dart';
 import 'package:compareapp/model/Publicacao.dart';
 import 'package:compareapp/telas/Destaques.dart';
 import 'package:compareapp/telas/Inicio.dart';
-import 'package:compareapp/telas/NovaPublicacao.dart';
 import 'package:compareapp/telas/Publicacoes.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/cupertino.dart';
@@ -42,7 +41,7 @@ class _HomeState extends State<Home> {
         foregroundColor: Colors.white,
         child: Icon(Icons.add),
         onPressed: (){
-          Navigator.push(context, MaterialPageRoute( builder: (context)=> NovaPublicacao()));
+          Navigator.pushNamed(context,"/novaPublicacao");
         },
       ),
       bottomNavigationBar: BottomNavigationBar(
