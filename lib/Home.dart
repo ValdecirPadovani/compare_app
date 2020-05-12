@@ -66,10 +66,6 @@ class _HomeState extends State<Home> {
               title: Text("Destaques"),
               icon: Icon(Icons.grade)
           ),
-          BottomNavigationBarItem(
-              title: Text("Biblioteca"),
-              icon: Icon(Icons.folder)
-          )
         ],
       ),
     );

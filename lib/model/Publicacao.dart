@@ -25,7 +25,7 @@ class Publicacao{
     "image" : this._image,
     "lojaId" : this._loja.nome,
     "produtoId" : this._produto.nome,
-    "clienteId" :  this._cliente.id,
+    "clienteId" :  this._cliente.nome,
     "dataPublicacao" : this._dataPublicacao
     };
 

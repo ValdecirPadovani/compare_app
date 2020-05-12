@@ -19,7 +19,7 @@ class NovaPublicacao extends StatefulWidget {
 
 class _NovaPublicacaoState extends State<NovaPublicacao> {
 
-
+  Firestore db = Firestore.instance;
   TextEditingController _precoController = TextEditingController();
   TextEditingController _tituloController = TextEditingController();
   TextEditingController _lojaController = TextEditingController();
@@ -27,6 +27,8 @@ class _NovaPublicacaoState extends State<NovaPublicacao> {
   File _imagem;
   bool _subindoImagem;
   String _urlRecuperada;
+  String _totalPublicado;
+  String _nomeUsuario;
 
   @override
   void initState() {
@@ -117,7 +119,7 @@ class _NovaPublicacaoState extends State<NovaPublicacao> {
                 Padding(padding: EdgeInsets.only(bottom: 8),
                   child: TextField(
                     keyboardType: TextInputType.number,
-                    inputFormatters: <TextInputFormatter>[WhitelistingTextInputFormatter.digitsOnly],
+                    //inputFormatters: <TextInputFormatter>[WhitelistingTextInputFormatter.digitsOnly],
                     controller: _precoController,
                     style: TextStyle(fontSize: 20),
                     decoration: InputDecoration(
@@ -212,7 +214,6 @@ class _NovaPublicacaoState extends State<NovaPublicacao> {
               },
             )
           ],
-
         );
     });
   }
@@ -222,6 +223,7 @@ class _NovaPublicacaoState extends State<NovaPublicacao> {
     //adicionando o id do usuário
     Cliente cliente = new Cliente();
     cliente.id = _idUsuarioLogado;
+    cliente.nome  = _nomeUsuario;
 
     Publicacao publicacao = new Publicacao.empty();
     publicacao.descricao= _tituloController.text;
@@ -235,9 +237,10 @@ class _NovaPublicacaoState extends State<NovaPublicacao> {
 
     await db.collection("publicacoes")
         .document( _idUsuarioLogado )
-        .setData(publicacao.toMap());
+        .collection("publicacao")
+        .add(publicacao.toMap());
 
-    Navigator.pushNamed(context, "/home");
+    Navigator.pushReplacementNamed(context, "/home");
   }
 
   _recuperarUrlImagem(StorageTaskSnapshot snapshot) async{
@@ -254,13 +257,44 @@ class _NovaPublicacaoState extends State<NovaPublicacao> {
     setState(() {
       _idUsuarioLogado = usuarioLogado.uid;
     });
+    _recuperarNomeUsuario();
+  }
+
+  _recuperaQuantidadePublicada() async{
+
+    var stream = db.collection("publicacoes").document(_idUsuarioLogado).collection("publicacao");
+    var snapShot = await stream.getDocuments();
+    print(snapShot.documents.length);
+    if(snapShot.documents.length == null){
+      setState(() {
+        _totalPublicado = "0";
+      });
+    }else{
+      setState(() {
+        _totalPublicado = snapShot.documents.length.toString();
+      });
+    }
+    print(_totalPublicado.toString());
+  }
+
+  _recuperarNomeUsuario()async{
+     db.collection("usuarios").document(_idUsuarioLogado).get().then((documento){
+       var doc = documento['nome'];
+       assert(doc is String);
+       setState(() {
+         _nomeUsuario = doc;
+       });
+     });
   }
 
   Future _uploadImagem(){
+
+    _recuperaQuantidadePublicada();
+
     FirebaseStorage storage = FirebaseStorage.instance;
     StorageReference pastaRaiz = storage.ref();
-    StorageReference arquivo = pastaRaiz.child("publicacoes").child(_idUsuarioLogado+".jpg");
-
+    String nomeImagem = _idUsuarioLogado+"_"+_totalPublicado+".jpg";
+    StorageReference arquivo = pastaRaiz.child("publicacoes").child(nomeImagem);
     //Progresso da imagem sendo enviada ao servidor
     StorageUploadTask task = arquivo.putFile(_imagem);
 
@@ -275,7 +309,6 @@ class _NovaPublicacaoState extends State<NovaPublicacao> {
         });
       }
     });
-
     //Recuperar imagem
     task.onComplete.then((StorageTaskSnapshot snapshot){
       _recuperarUrlImagem(snapshot);

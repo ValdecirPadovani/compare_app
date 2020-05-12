@@ -137,6 +137,7 @@ class _NovoClienteState extends State<NovoCliente> {
                 Padding(
                     padding: EdgeInsets.only(bottom: 8),
                   child: TextField(
+                    obscureText: true,
                     controller: _controllerSenha,
                     keyboardType: TextInputType.text,
                     style: TextStyle(fontSize: 20),
@@ -148,8 +149,9 @@ class _NovoClienteState extends State<NovoCliente> {
                         fillColor: Colors.white,
                         border: OutlineInputBorder(
                             borderRadius: BorderRadius.circular(32)
-                        )
+                        ),
                     ),
+
                   ),
                 ),
                 //TextField confirmar senha
