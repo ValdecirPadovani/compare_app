@@ -12,6 +12,7 @@ class Publicacao{
   Produto   _produto;
   Cliente   _cliente;
   String  _dataPublicacao;
+  String  _precoProduto;
 
 
   Publicacao(this._id, this._descricao, this._loja, this._produto,
@@ -21,18 +22,26 @@ class Publicacao{
 
   Map toMap(){
     Map<String, dynamic> map ={
-    "descricao" : this._descricao,
-    "image" : this._image,
-    "lojaId" : this._loja.nome,
-    "produtoId" : this._produto.nome,
-    "clienteId" :  this._cliente.nome,
-    "dataPublicacao" : this._dataPublicacao
+    "descricao"       : this._descricao,
+    "image"           : this._image,
+    "lojaId"          : this._loja.nome,
+    "produtoId"       : this._produto.nome,
+    "clienteId"       :  this._cliente.nome,
+    "dataPublicacao"  : this._dataPublicacao,
+    "precoProduto"    :this.precoProduto
     };
 
     if(this._id != null){
       map["id"] = this._id;
     }
     return map;
+  }
+
+
+  String get precoProduto => _precoProduto;
+
+  set precoProduto(String value) {
+    _precoProduto = value;
   }
 
   String get dataPublicacao => _dataPublicacao;

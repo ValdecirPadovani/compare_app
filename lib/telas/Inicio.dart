@@ -3,6 +3,7 @@ import 'dart:async';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:intl/intl.dart';
 
 class Inicio extends StatefulWidget {
   @override
@@ -14,6 +15,8 @@ class _InicioState extends State<Inicio> {
   final _controller = StreamController<QuerySnapshot>.broadcast();
   String _idUsuarioLogado;
   Firestore db = Firestore.instance;
+  var _format = new DateFormat.yMd().add_Hms();
+
 
   Stream<QuerySnapshot> _adicionarListenerConversas(){
     final stream = db.collectionGroup("publicacao").getDocuments().asStream();
@@ -40,6 +43,7 @@ class _InicioState extends State<Inicio> {
 
   @override
   Widget build(BuildContext context) {
+
     return  StreamBuilder<QuerySnapshot>(
         stream: _controller.stream,
         // ignore: missing_return
@@ -115,7 +119,31 @@ class _InicioState extends State<Inicio> {
                                               )
                                             ],
                                           ),
-                                          //Data publicação
+                                          //Preço do produto
+                                          Row(
+                                            children: <Widget>[
+                                              Expanded(
+                                                child: Padding(
+                                                  padding: EdgeInsets.only(top: 10),
+                                                  child: Row(
+                                                    children: <Widget>[
+                                                      Icon(
+                                                        Icons.attach_money,
+                                                        color: Colors.deepOrangeAccent,
+                                                      ),
+                                                      Text(
+                                                        publicacao['precoProduto'] == null
+                                                        ? "Sempre preco" : publicacao['precoProduto'],
+                                                        style: TextStyle(
+                                                          fontSize: 16,
+                                                        ),
+                                                      ),
+                                                    ],
+                                                  ),
+                                                ),
+                                              )
+                                            ],
+                                          ),
                                           Row(
                                             children: <Widget>[
                                               Expanded(
@@ -128,7 +156,7 @@ class _InicioState extends State<Inicio> {
                                                         color: Colors.deepOrangeAccent,
                                                       ),
                                                       Text(
-                                                        "Publicado dia: 10/03/2020",
+                                                        _format.format(DateTime.parse(publicacao['dataPublicacao'])),
                                                         style: TextStyle(
                                                           fontSize: 16,
                                                         ),

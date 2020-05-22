@@ -158,6 +158,7 @@ class _NovoClienteState extends State<NovoCliente> {
                 Padding(
                     padding: EdgeInsets.only(bottom: 8),
                     child: TextField(
+                      obscureText: true,
                       keyboardType: TextInputType.text,
                       style: TextStyle(fontSize: 20),
                       decoration: InputDecoration(

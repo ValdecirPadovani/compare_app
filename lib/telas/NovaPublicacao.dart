@@ -101,6 +101,7 @@ class _NovaPublicacaoState extends State<NovaPublicacao> {
                 Padding(
                   padding: EdgeInsets.only(bottom: 8),
                   child: TextField(
+                    inputFormatters: [LengthLimitingTextInputFormatter(50)],
                     controller: _tituloController,
                     keyboardType: TextInputType.text,
                     style: TextStyle(fontSize: 20),
@@ -231,6 +232,7 @@ class _NovaPublicacaoState extends State<NovaPublicacao> {
     publicacao.image = _urlRecuperada;
     publicacao.loja = new Loja("10", _lojaController.text, "16 3987 4540", "Habib Jabali 1500");
     publicacao.cliente = cliente;
+    publicacao.precoProduto = _precoController.text;
     publicacao.produto = new Produto("02", "Arroz tipo 1 5Kg");
 
     Firestore db = Firestore.instance;
@@ -274,7 +276,6 @@ class _NovaPublicacaoState extends State<NovaPublicacao> {
         _totalPublicado = snapShot.documents.length.toString();
       });
     }
-    print(_totalPublicado.toString());
   }
 
   _recuperarNomeUsuario()async{
@@ -287,9 +288,9 @@ class _NovaPublicacaoState extends State<NovaPublicacao> {
      });
   }
 
-  Future _uploadImagem(){
+  Future _uploadImagem() async{
 
-    _recuperaQuantidadePublicada();
+    await _recuperaQuantidadePublicada();
 
     FirebaseStorage storage = FirebaseStorage.instance;
     StorageReference pastaRaiz = storage.ref();
@@ -325,6 +326,7 @@ class _NovaPublicacaoState extends State<NovaPublicacao> {
         imagemSelecionada = await ImagePicker.pickImage(source: ImageSource.gallery);
         break;
     }
+    print(imagemSelecionada);
     setState(() {
       _imagem = imagemSelecionada;
       if(_imagem != null){
