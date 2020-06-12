@@ -1,6 +1,5 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:compareapp/model/Cliente.dart';
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 
@@ -80,7 +79,6 @@ class _NovoClienteState extends State<NovoCliente> {
         title: Text("Novo cadastro"),
       ),
       body: Container(
-
         child: Center(
           child: SingleChildScrollView(
             child: Column(

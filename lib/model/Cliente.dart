@@ -4,7 +4,7 @@ class Cliente{
   String _id;
   String _nome;
   String _email;
-  //TipoCliente tipo;
+  String _urlImage;
   String senha;
 
   Cliente();
@@ -12,9 +12,16 @@ class Cliente{
   Map<String, dynamic> toMap(){
     Map<String, dynamic> map = {
       "nome" : this.nome,
-      "email" : this.email
+      "email" : this.email,
+      "urlImage" : this.urlImage
     };
     return map;
+  }
+
+  String get urlImage => _urlImage;
+
+  set urlImage(String value) {
+    _urlImage = value;
   }
 
   String get id => _id;
@@ -34,6 +41,4 @@ class Cliente{
   set nome(String value) {
     _nome = value;
   }
-
-
 }

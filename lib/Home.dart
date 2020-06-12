@@ -77,6 +77,9 @@ class _HomeState extends State<Home> {
     Navigator.pushReplacementNamed(context,"/login");
   }
 
+  _dadosUsuario(){
+    Navigator.pushNamed(context, "/dadosUsuario");
+  }
   Widget _myDrawer(){
     return Drawer(
       child: Column(
@@ -100,7 +103,7 @@ class _HomeState extends State<Home> {
                 style: TextStyle(fontSize: 20),
             ),
             onTap: (){
-
+              _dadosUsuario();
             },
           ),
           ListTile(

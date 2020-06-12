@@ -1,4 +1,5 @@
 import 'package:compareapp/Home.dart';
+import 'package:compareapp/telas/CadastroUsuario.dart';
 import 'package:compareapp/telas/Login.dart';
 import 'package:compareapp/telas/NovaPublicacao.dart';
 import 'package:flutter/material.dart';
@@ -37,6 +38,11 @@ class RouterGenerator{
       case "/publicacoes":
         return MaterialPageRoute(
           builder: (_) => Home()
+        );
+
+      case "/dadosUsuario":
+        return MaterialPageRoute(
+            builder: (_) => CadastroUsuario()
         );
 
       default:

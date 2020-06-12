@@ -29,6 +29,7 @@ class _NovaPublicacaoState extends State<NovaPublicacao> {
   String _urlRecuperada;
   String _totalPublicado;
   String _nomeUsuario;
+  final _picker = ImagePicker();
 
   @override
   void initState() {
@@ -263,7 +264,6 @@ class _NovaPublicacaoState extends State<NovaPublicacao> {
   }
 
   _recuperaQuantidadePublicada() async{
-
     var stream = db.collection("publicacoes").document(_idUsuarioLogado).collection("publicacao");
     var snapShot = await stream.getDocuments();
     print(snapShot.documents.length);
@@ -318,15 +318,17 @@ class _NovaPublicacaoState extends State<NovaPublicacao> {
 
   Future _recuperarImagem(String origem) async{
     File imagemSelecionada;
-    switch(origem){
+    final piker = ImagePicker();
+    switch (origem) {
       case "camera":
-        imagemSelecionada = await ImagePicker.pickImage(source: ImageSource.camera);
+        final pikedImageCamera = await piker.getImage(source: ImageSource.camera,imageQuality: 1);
+        imagemSelecionada = File(pikedImageCamera.path);
         break;
       case "galeria":
-        imagemSelecionada = await ImagePicker.pickImage(source: ImageSource.gallery);
+        final pikedImageGallery = await piker.getImage(source: ImageSource.gallery, );
+        imagemSelecionada = File(pikedImageGallery.path);
         break;
     }
-    print(imagemSelecionada);
     setState(() {
       _imagem = imagemSelecionada;
       if(_imagem != null){
