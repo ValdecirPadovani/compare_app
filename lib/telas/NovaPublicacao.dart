@@ -321,7 +321,7 @@ class _NovaPublicacaoState extends State<NovaPublicacao> {
     final piker = ImagePicker();
     switch (origem) {
       case "camera":
-        final pikedImageCamera = await piker.getImage(source: ImageSource.camera,imageQuality: 1);
+        final pikedImageCamera = await piker.getImage(source: ImageSource.camera,maxHeight: 480, maxWidth: 640);
         imagemSelecionada = File(pikedImageCamera.path);
         break;
       case "galeria":
