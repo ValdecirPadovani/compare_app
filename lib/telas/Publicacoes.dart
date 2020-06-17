@@ -74,161 +74,160 @@ class _PublicacoesState extends State<Publicacoes> {
                   itemBuilder: (context, index) {
                     List<DocumentSnapshot> publicacoes = querySnapshot.documents.toList();
                     DocumentSnapshot publicacao = publicacoes[index];
-
-                    return GestureDetector(
-                      child: Column(
-                        children: <Widget>[
-                          Container(
-                            height: 200,
-                            child: Row(
-                              children: <Widget>[
-                                //Correspondente a imagem para a publicação
-                                Expanded(
-                                  flex: 1,
-                                  child: Container(
+                    return Card(
+                      child: GestureDetector(
+                        child: Column(
+                          children: <Widget>[
+                            Row(
+                                children: <Widget>[
+                                  //Correspondente a imagem para a publicação
+                                  Expanded(
+                                    flex: 1,
                                     child: Container(
-                                      child: Image.network(publicacao["image"]),
-                                      color: Colors.white70,
-                                    ),
-                                  ),
-                                ),
-                                //Correspondente aos dados da publicação
-                                Expanded(
-                                    flex: 2,
-                                    child: Container(
-                                      decoration: BoxDecoration(
-                                        color: Colors.white,
-                                      ),
+                                      width: double.infinity,
                                       child: Column(
+                                        crossAxisAlignment: CrossAxisAlignment.stretch,
+                                        mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                                         children: <Widget>[
-                                          //Descrição
-                                          Row(
-                                            children: <Widget>[
-                                              Expanded(
-                                                child: Padding(
-                                                  padding:
-                                                      EdgeInsets.only(top: 15),
-                                                  child: Text(
-                                                    publicacao["descricao"],
-                                                    style: TextStyle(
-                                                      fontSize: 20,
-                                                      fontWeight:
-                                                          FontWeight.bold,
-                                                    ),
-                                                  ),
-                                                ),
-                                              )
-                                            ],
-                                          ),
-                                          //Data publicação
-                                          Row(
-                                            children: <Widget>[
-                                              Expanded(
-                                                child: Padding(
-                                                  padding:
-                                                      EdgeInsets.only(top: 10),
-                                                  child: Row(
-                                                    children: <Widget>[
-                                                      Icon(
-                                                        Icons.calendar_today,
-                                                        color: Colors.deepOrangeAccent,
-                                                      ),
-                                                      Text(
-                                                        "Publicado dia: 10/03/2020",
-                                                        style: TextStyle(
-                                                          fontSize: 16,
-                                                        ),
-                                                      ),
-                                                    ],
-                                                  ),
-                                                ),
-                                              )
-                                            ],
-                                          ),
-                                          //Loja
-                                          Row(
-                                            children: <Widget>[
-                                              Expanded(
-                                                child: Padding(
-                                                  padding:
-                                                      EdgeInsets.only(top: 10),
-                                                  child: Row(
-                                                    children: <Widget>[
-                                                      Icon(
-                                                        Icons.room,
-                                                        color: Colors
-                                                            .deepOrangeAccent,
-                                                      ),
-                                                      Expanded(
-                                                        child: Text(
-                                                          publicacao["lojaId"] ==
-                                                                  null
-                                                              ? ""
-                                                              : publicacao[
-                                                                  "lojaId"],
-                                                          style: TextStyle(
-                                                            fontSize: 16,
-                                                          ),
-                                                        ),
-                                                      )
-                                                    ],
-                                                  ),
-                                                ),
-                                              )
-                                            ],
-                                          ),
-                                          Row(
-                                            children: <Widget>[
-                                              Expanded(
-                                                child: Padding(
-                                                  padding:
-                                                      EdgeInsets.only(top: 10),
-                                                  child: Row(
-                                                    children: <Widget>[
-                                                      Icon(
-                                                        Icons.assignment_ind,
-                                                        color: Colors
-                                                            .deepOrangeAccent,
-                                                      ),
-                                                      Expanded(
-                                                        child: Text(
-                                                          publicacao["clienteId"] ==
-                                                                  null
-                                                              ? "nome"
-                                                              : publicacao[
-                                                                  "clienteId"],
-                                                          style: TextStyle(
-                                                            fontSize: 16,
-                                                          ),
-                                                        ),
-                                                      )
-                                                    ],
-                                                  ),
-                                                ),
-                                              )
-                                            ],
-                                          )
+                                          Image.network(publicacao["image"],height: 148,width: 150,fit: BoxFit.fill,),
                                         ],
                                       ),
-                                    ))
-                              ],
-                            ),
-                          ),
-                          ListTile(
-                            title: Text(
-                              publicacao["descricao"],
-                              style: TextStyle(
-                                  fontSize: 16, fontWeight: FontWeight.bold),
-                            ),
-                            subtitle: Text(""),
-                          )
-                        ],
+                                    ),
+                                  ),
+                                  //Correspondente aos dados da publicação
+                                  Expanded(
+                                      flex: 2,
+                                      child: Container(
+                                        decoration: BoxDecoration(
+                                          color: Colors.white,
+                                        ),
+                                        child: Column(
+                                          children: <Widget>[
+                                            //Descrição
+                                            Row(
+                                              children: <Widget>[
+                                                Expanded(
+                                                  child: Padding(
+                                                    padding: EdgeInsets.only(top: 10),
+                                                    child: Row(
+                                                      children: <Widget>[
+                                                        Icon(
+                                                          Icons.attach_money,
+                                                          color: Colors.deepOrangeAccent,
+                                                        ),
+                                                        Text(
+                                                          publicacao['precoProduto'] == null
+                                                              ? "Sempre preco" : publicacao['precoProduto'],
+                                                          style: TextStyle(
+                                                            fontSize: 16,
+                                                          ),
+                                                        ),
+                                                      ],
+                                                    ),
+                                                  ),
+                                                )
+                                              ],
+                                            ),
+                                            //Data publicação
+                                            Row(
+                                              children: <Widget>[
+                                                Expanded(
+                                                  child: Padding(
+                                                    padding: EdgeInsets.only(top: 10),
+                                                    child: Row(
+                                                      children: <Widget>[
+                                                        Icon(
+                                                          Icons.calendar_today,
+                                                          color: Colors.deepOrangeAccent,
+                                                        ),
+                                                        Text(
+                                                          publicacao['dataPublicacao'],
+                                                          style: TextStyle(
+                                                            fontSize: 16,
+                                                          ),
+                                                        ),
+                                                      ],
+                                                    ),
+                                                  ),
+                                                )
+                                              ],
+                                            ),
+                                            //Loja
+                                            Row(
+                                              children: <Widget>[
+                                                Expanded(
+                                                  child: Padding(
+                                                    padding: EdgeInsets.only(top: 10),
+                                                    child: Row(
+                                                      children: <Widget>[
+                                                        Icon(
+                                                          Icons.room,
+                                                          color: Colors.deepOrangeAccent,
+                                                        ),
+                                                        Expanded(
+                                                          child: Text(
+                                                            publicacao["lojaId"] == null
+                                                                ? "" : publicacao["lojaId"],
+                                                            style: TextStyle(
+                                                              fontSize: 16,
+                                                            ),
+                                                          ),
+                                                        )
+                                                      ],
+                                                    ),
+                                                  ),
+                                                )
+                                              ],
+                                            ),
+                                            Row(
+                                              children: <Widget>[
+                                                Expanded(
+                                                  child: Padding(
+                                                    padding: EdgeInsets.only(top: 10),
+                                                    child: Row(
+                                                      children: <Widget>[
+                                                        Icon(
+                                                          Icons.assignment_ind,
+                                                          color: Colors.deepOrangeAccent,
+                                                        ),
+                                                        Expanded(
+                                                          child: Text(
+                                                            publicacao["clienteId"] == null
+                                                                ? "nome" : publicacao["clienteId"]
+                                                            ,
+                                                            style: TextStyle(
+                                                              fontSize: 16,
+                                                            ),
+                                                          ),
+                                                        )
+                                                      ],
+                                                    ),
+                                                  ),
+                                                )
+                                              ],
+                                            )
+                                          ],
+                                        ),
+                                      ))
+                                ],
+                              ),
+                            ListTile(
+                              title: Text(
+                                publicacao["descricao"],
+                                style: TextStyle(
+                                    fontSize: 18,
+                                    fontWeight: FontWeight.bold
+                                ),
+                              ),
+                              subtitle: Text(""),
+                            )
+                          ],
+                        ),
                       ),
                     );
                   },
                   separatorBuilder: (context, index) => Divider(
-                    height: 3,
-                    color: Colors.red,
+                    height: 15,
                   ),
                   itemCount: querySnapshot.documents.length,
                 );

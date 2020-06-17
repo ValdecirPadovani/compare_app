@@ -108,6 +108,9 @@ class _InicioState extends State<Inicio> {
                                     Expanded(
                                         flex: 2,
                                         child: Container(
+                                          decoration: BoxDecoration(
+                                            color: Colors.white,
+                                          ),
                                           child: Column(
                                             children: <Widget>[
                                               //Preço do produto
