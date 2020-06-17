@@ -10,6 +10,7 @@ import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:image_picker/image_picker.dart';
+import 'package:intl/intl.dart';
 
 
 class NovaPublicacao extends StatefulWidget {
@@ -30,6 +31,7 @@ class _NovaPublicacaoState extends State<NovaPublicacao> {
   String _totalPublicado;
   String _nomeUsuario;
   final _picker = ImagePicker();
+  var _format = new DateFormat('d/M/y').add_Hms();
 
   @override
   void initState() {
@@ -229,7 +231,8 @@ class _NovaPublicacaoState extends State<NovaPublicacao> {
 
     Publicacao publicacao = new Publicacao.empty();
     publicacao.descricao= _tituloController.text;
-    publicacao.dataPublicacao = DateTime.now().toIso8601String();
+    publicacao.dataPublicacao = _format.format(DateTime.now()).toString();
+    publicacao.time = DateTime.now().toUtc();
     publicacao.image = _urlRecuperada;
     publicacao.loja = new Loja("10", _lojaController.text, "16 3987 4540", "Habib Jabali 1500");
     publicacao.cliente = cliente;

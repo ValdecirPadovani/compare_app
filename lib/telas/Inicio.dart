@@ -3,6 +3,7 @@ import 'dart:async';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:intl/date_symbol_data_file.dart';
 import 'package:intl/intl.dart';
 
 class Inicio extends StatefulWidget {
@@ -15,11 +16,12 @@ class _InicioState extends State<Inicio> {
   final _controller = StreamController<QuerySnapshot>.broadcast();
   String _idUsuarioLogado;
   Firestore db = Firestore.instance;
-  var _format = new DateFormat.yMd().add_Hms();
+  //var _format = new DateFormat('d/M/y','pt_BR').add_Hms();
+  static const locale = 'pr_BR';
 
 
   Stream<QuerySnapshot> _adicionarListenerConversas(){
-    final stream = db.collectionGroup("publicacao").getDocuments().asStream();
+    final stream = db.collectionGroup("publicacao").orderBy('time', descending: true).getDocuments().asStream();
     stream.listen(
             (dados){_controller.add(dados);
         });
@@ -38,6 +40,7 @@ class _InicioState extends State<Inicio> {
   @override
   void initState() {
     _recuperarUsuarioLogado();
+
     super.initState();
   }
 
@@ -144,7 +147,7 @@ class _InicioState extends State<Inicio> {
                                                             color: Colors.deepOrangeAccent,
                                                           ),
                                                           Text(
-                                                            _format.format(DateTime.parse(publicacao['dataPublicacao'])),
+                                                            publicacao['dataPublicacao'],
                                                             style: TextStyle(
                                                               fontSize: 16,
                                                             ),

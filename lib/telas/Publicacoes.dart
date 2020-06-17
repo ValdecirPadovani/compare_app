@@ -19,6 +19,7 @@ class _PublicacoesState extends State<Publicacoes> {
         .collection("publicacoes")
         .document(_idUsuarioLogado)
         .collection("publicacao")
+        .orderBy("time", descending: true)
         .snapshots();
 
     stream.listen((dados) {
@@ -130,8 +131,7 @@ class _PublicacoesState extends State<Publicacoes> {
                                                     children: <Widget>[
                                                       Icon(
                                                         Icons.calendar_today,
-                                                        color: Colors
-                                                            .deepOrangeAccent,
+                                                        color: Colors.deepOrangeAccent,
                                                       ),
                                                       Text(
                                                         "Publicado dia: 10/03/2020",

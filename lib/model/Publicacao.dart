@@ -11,12 +11,13 @@ class Publicacao{
   Loja      _loja;
   Produto   _produto;
   Cliente   _cliente;
-  String  _dataPublicacao;
-  String  _precoProduto;
+  DateTime  _time;
+  String    _precoProduto;
+  String    _dataPublicacao;
 
 
   Publicacao(this._id, this._descricao, this._loja, this._produto,
-      this._cliente,this._image, this._dataPublicacao);
+      this._cliente,this._image, this._time, this._dataPublicacao);
 
   Publicacao.empty();
 
@@ -27,7 +28,8 @@ class Publicacao{
     "lojaId"          : this._loja.nome,
     "produtoId"       : this._produto.nome,
     "clienteId"       :  this._cliente.nome,
-    "dataPublicacao"  : this._dataPublicacao,
+    "time"            : this._time,
+    "dataPublicacao"  : this.dataPublicacao,
     "precoProduto"    :this.precoProduto
     };
 
@@ -38,16 +40,22 @@ class Publicacao{
   }
 
 
-  String get precoProduto => _precoProduto;
-
-  set precoProduto(String value) {
-    _precoProduto = value;
-  }
-
   String get dataPublicacao => _dataPublicacao;
 
   set dataPublicacao(String value) {
     _dataPublicacao = value;
+  }
+
+  DateTime get time => _time;
+
+  set time(DateTime value) {
+    _time = value.toUtc();
+  }
+
+  String get precoProduto => _precoProduto;
+
+  set precoProduto(String value) {
+    _precoProduto = value;
   }
 
   String get image => _image;
