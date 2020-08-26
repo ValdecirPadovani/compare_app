@@ -1,16 +1,20 @@
 import 'dart:io';
 
+import 'package:brasil_fields/brasil_fields.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:compareapp/model/Cliente.dart';
 import 'package:compareapp/model/Loja.dart';
 import 'package:compareapp/model/Publicacao.dart';
-import 'package:compareapp/model/Cliente.dart';
-import 'package:compareapp/model/Produto.dart';
+import 'package:compareapp/telas/widgets/BotaoCustomizado.dart';
+import 'package:compareapp/telas/widgets/ImputCustomzado.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:flutter_masked_text/flutter_masked_text.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:intl/intl.dart';
+import 'package:validadores/Validador.dart';
 
 
 class NovaPublicacao extends StatefulWidget {
@@ -21,22 +25,21 @@ class NovaPublicacao extends StatefulWidget {
 class _NovaPublicacaoState extends State<NovaPublicacao> {
 
   Firestore db = Firestore.instance;
-  TextEditingController _precoController = TextEditingController();
-  TextEditingController _tituloController = TextEditingController();
-  TextEditingController _lojaController = TextEditingController();
   String _idUsuarioLogado = "";
-  File _imagem;
-  bool _subindoImagem;
-  String _urlRecuperada;
-  String _totalPublicado;
   String _nomeUsuario;
-  final _picker = ImagePicker();
   var _format = new DateFormat('d/M/y').add_Hms();
+  BuildContext _dialogContext;
+
+  //Novas variaveis
+  List<File> _listImagens = List();
+  final _formKey = GlobalKey<FormState>();
+  Publicacao _publicacao;
 
   @override
   void initState() {
     _recuperarUsuarioLogado();
     super.initState();
+    _publicacao = Publicacao.gerarId();
   }
 
   @override
@@ -46,112 +49,182 @@ class _NovaPublicacaoState extends State<NovaPublicacao> {
         backgroundColor: Colors.deepOrangeAccent,
         title: Text("Nova publicação"),
       ),
-      body: Container(
-        child: Center(
-          child: SingleChildScrollView(
+      body: SingleChildScrollView(
+        child: Container(
+          padding: EdgeInsets.all(16),
+          child: Form(
+            key: _formKey,
             child: Column(
+              crossAxisAlignment: CrossAxisAlignment.stretch,
               children: <Widget>[
-               //Imagem
-               Padding(
-                 padding: EdgeInsets.all(3),
-                    child:Container(
-                      height: 170,
-                      width: 350,
-                      decoration: BoxDecoration(
-                        color: Colors.grey,
-                        image: DecorationImage(
-                            image:_urlRecuperada == null ?
-                            AssetImage("images/compare.png"):
-                            NetworkImage(_urlRecuperada ),
-                            fit: BoxFit.cover
-                        ),
-                        border: Border.all(color: Colors.redAccent)
-                      ),
-                    ),
-                  ),
-                 Row(
-                   mainAxisAlignment: MainAxisAlignment.center,
-                    children: <Widget>[
-                      FlatButton(
-                        child: IconButton(
-                          icon: Icon(
-                            Icons.add_a_photo,
-                            color: Colors.green,
-                            size: 40,
+                //Imagem
+                FormField<List>(
+                  initialValue: _listImagens,
+                  validator: (imagens) {
+                    if (imagens.length == 0) {
+                      return "Necessário uma imagem";
+                    }
+                    return null;
+                  },
+                  builder: (state) {
+                    return Column(
+                      children: <Widget>[
+                        Container(
+                          height: 100,
+                          child: ListView.builder(
+                            scrollDirection: Axis.horizontal,
+                            itemCount: _listImagens.length + 1,
+                            itemBuilder: (context, indice) {
+                              if (indice == _listImagens.length) {
+                                return Padding(
+                                  padding: EdgeInsets.symmetric(horizontal: 8),
+                                  child: GestureDetector(
+                                    onTap: () {
+                                      _selecionarImagemGaleria();
+                                    },
+                                    child: CircleAvatar(
+                                      backgroundColor: Colors.grey[400],
+                                      radius: 50,
+                                      child: Column(
+                                        mainAxisAlignment:
+                                        MainAxisAlignment.center,
+                                        children: <Widget>[
+                                          Icon(
+                                            Icons.add_a_photo,
+                                            size: 40,
+                                            color: Colors.grey[100],
+                                          ),
+                                          Text(
+                                            "Adicionar",
+                                            style: TextStyle(
+                                                color: Colors.grey[100]),
+                                          )
+                                        ],
+                                      ),
+                                    ),
+                                  ),
+                                );
+                              }
+                              if (_listImagens.length > 0) {
+                                return Padding(
+                                  padding: EdgeInsets.symmetric(horizontal: 8),
+                                  child: GestureDetector(
+                                    onTap: () {
+                                      showDialog(
+                                          context: context,
+                                          builder: (context) =>
+                                              Dialog(
+                                                child: Column(
+                                                  mainAxisSize:
+                                                  MainAxisSize.min,
+                                                  children: <Widget>[
+                                                    Image.file(
+                                                        _listImagens[indice]),
+                                                    FlatButton(
+                                                      child: Text("Excluir"),
+                                                      textColor: Colors.red,
+                                                      onPressed: () {
+                                                        setState(() {
+                                                          _listImagens
+                                                              .removeAt(indice);
+                                                          Navigator.of(context)
+                                                              .pop();
+                                                        });
+                                                      },
+                                                    )
+                                                  ],
+                                                ),
+                                              ));
+                                    },
+                                    child: CircleAvatar(
+                                      radius: 50,
+                                      backgroundImage:
+                                      FileImage(_listImagens[indice]),
+                                      child: Container(
+                                        color:
+                                        Color.fromRGBO(255, 255, 255, 0.4),
+                                        alignment: Alignment.center,
+                                        child: Icon(
+                                          Icons.delete,
+                                          color: Colors.red,
+                                        ),
+                                      ),
+                                    ),
+                                  ),
+                                );
+                              }
+                              return Container();
+                            },
                           ),
-                          padding: EdgeInsets.only(bottom: 8),
                         ),
-                        onPressed: (){
-                          _recuperarImagem("camera");
-                        },
-                      ),
-                      FlatButton(
-                        child: IconButton(
-                          icon: Icon(
-                              Icons.folder_shared,
-                            color: Colors.blue,
-                            size: 40,
-                          ),
-                          padding: EdgeInsets.only(bottom: 8),
-                        ),
-                        onPressed: (){
-                          _recuperarImagem("galeria");
-                        },
-                      ),
-                    ],
-                  ),
+                        if(state.hasError)
+                          Container(
+                            child: Text(
+                              "[${state.errorText}]",
+                              style: TextStyle(
+                                  color: Colors.red, fontSize: 14
+                              ),
+                            ),
+                          )
+                      ],
+                    );
+                  },
+                ),
                 //Titulo
                 Padding(
-                  padding: EdgeInsets.only(bottom: 8),
-                  child: TextField(
-                    inputFormatters: [LengthLimitingTextInputFormatter(50)],
-                    controller: _tituloController,
-                    keyboardType: TextInputType.text,
-                    style: TextStyle(fontSize: 20),
-                    decoration: InputDecoration(
-                      contentPadding: EdgeInsets.fromLTRB(32, 16, 32, 12),
-                      hintText: "Títudo da promoção",
-                      labelText: "Títudo da promoção",
-                      filled: true,
-                      border: OutlineInputBorder(
-                        borderRadius: BorderRadius.circular(32),
-                      )
-                    ),
+                  padding: EdgeInsets.only(bottom: 15, top: 15),
+                  child: ImputCustomizado(
+                    hint: "Título da publicação",
+                    label: "Títudo da promoção",
+                    onSaved: (descricao) {
+                      _publicacao.descricao = descricao;
+                    },
+                    validator: (valor) {
+                      return Validador()
+                          .add(Validar.OBRIGATORIO, msg: "Campo obrigatório")
+                          .maxLength(50, msg: "Máximo de caracteres")
+                          .valido(valor);
+                    },
                   ),
                 ),
                 //Preco
-                Padding(padding: EdgeInsets.only(bottom: 8),
-                  child: TextField(
-                    keyboardType: TextInputType.number,
-                    //inputFormatters: <TextInputFormatter>[WhitelistingTextInputFormatter.digitsOnly],
-                    controller: _precoController,
-                    style: TextStyle(fontSize: 20),
-                    decoration: InputDecoration(
-                        contentPadding: EdgeInsets.fromLTRB(32, 16, 32, 12),
-                        hintText: "Preço do produto",
-                        labelText: "Preço",
-                        filled: true,
-                        border: OutlineInputBorder(
-                          borderRadius: BorderRadius.circular(32),
-                        )
-                    ),
+                Padding(
+                  padding: EdgeInsets.only(bottom: 15),
+                  child: ImputCustomizado(
+                    type: TextInputType.number,
+                    inputFormatters: [
+                      WhitelistingTextInputFormatter.digitsOnly,
+                      RealInputFormatter(centavos: true)
+                    ],
+                    hint: "Preço do produto",
+                    label: "Preço",
+                    onSaved: (preco) {
+                      _publicacao.precoProduto = preco;
+                    },
+                    validator: (valor) {
+                      return Validador()
+                          .add(Validar.OBRIGATORIO, msg: "Campo obrigatório")
+                          .valido(valor);
+                    },
                   ),
                 ),
                 //Loja
-                Padding(padding: EdgeInsets.only(bottom: 8),
-                  child: TextField(
-                    keyboardType: TextInputType.text,
-                    controller: _lojaController,
-                    style: TextStyle(fontSize: 20),
-                    decoration: InputDecoration(
-                        contentPadding: EdgeInsets.fromLTRB(32, 16, 32, 12),
-                        hintText: "Loja",
-                        labelText: "Loja",
-                        filled: true,
-                        border: OutlineInputBorder(
-                          borderRadius: BorderRadius.circular(32),
-                        )
-                    ),
+                Padding(
+                  padding: EdgeInsets.only(bottom: 15),
+                  child: ImputCustomizado(
+                    hint: "Loja",
+                    label: "Loja",
+                    onSaved: (loja) {
+                      //ToDo: Resolver o problema da loja... Decidir se vai ser usado mapa ou livre pra digitação
+                      Loja _loja = new Loja(
+                          "10", loja, "16 3987 4540", "Habib Jabali 1500");
+                      _publicacao.loja = loja;
+                    },
+                    validator: (valor) {
+                      return Validador()
+                          .add(Validar.OBRIGATORIO, msg: "Campo obrigatório")
+                          .valido(valor);
+                    },
                   ),
                 ),
                 //Enviar - Cancelar
@@ -160,40 +233,28 @@ class _NovaPublicacaoState extends State<NovaPublicacao> {
                   child: Row(
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: <Widget>[
-                      RaisedButton(
-                        child: Text(
-                          "Enviar",
-                          style: TextStyle(color: Colors.white, fontSize: 15),
-                        ),
-                        color: Colors.deepOrangeAccent,
-                        padding: EdgeInsets.fromLTRB(32, 16, 32, 16),
-                        shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(32)
-                        ),
-                        onPressed: (){
-                          _urlRecuperada == null ? _createDialog(context) : _salvarPublicacao();
+                      BotaoCustomizado(
+                        texto: "Enviar",
+                        onPressed: () {
+                          if (_formKey.currentState.validate()) {
+                            _formKey.currentState.save();
+
+                            _dialogContext = context;
+
+                            _salvarNovaPublicacao();
+                          }
                         },
                       ),
                       Padding(
                         padding: EdgeInsets.all(5),
                       ),
-                      RaisedButton(
-                          child: Text(
-                            "Descartar",
-                            style: TextStyle(
-                                color: Colors.white,
-                                fontSize: 20,
-                            ),
-                          ),
-                          color: Colors.deepOrangeAccent,
-                          padding: EdgeInsets.fromLTRB(32, 16, 32, 16),
-                          shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(32)
-                          ),
-                          onPressed: (){
-                            Navigator.pushNamedAndRemoveUntil(context,"/home",(_)=>false);
-                          },
-                        ),
+                      BotaoCustomizado(
+                        texto: "Descartar",
+                        onPressed: () {
+                          Navigator.pushNamedAndRemoveUntil(
+                              context, "/home", (_) => false);
+                        },
+                      ),
                     ],
                   ),
                 )
@@ -205,55 +266,48 @@ class _NovaPublicacaoState extends State<NovaPublicacao> {
     );
   }
 
-   _createDialog( BuildContext context){
-    return showDialog(context: context, builder: (context){
-        return AlertDialog(
-          title: Text("Selecione uma imagem"),
-          actions: <Widget>[
-            MaterialButton(
-              elevation: 6,
-              child: Text("OK"),
-              onPressed: (){
-                  Navigator.of(context).pop();
-              },
-            )
-          ],
-        );
-    });
+  Future _uploadImagens() async {
+    FirebaseStorage storage = FirebaseStorage.instance;
+    StorageReference pastaRaiz = storage.ref();
+
+    for (var imagem in _listImagens) {
+      String nomeImagem = DateTime
+          .now()
+          .millisecondsSinceEpoch
+          .toString();
+      StorageReference arquivo = pastaRaiz
+          .child("meus_anuncios")
+          .child(_publicacao.id)
+          .child(nomeImagem);
+
+      StorageUploadTask uploadTask = arquivo.putFile(imagem);
+      StorageTaskSnapshot taskSnapshot = await uploadTask.onComplete;
+      String url = await taskSnapshot.ref.getDownloadURL();
+      _publicacao.image.add(url);
+    }
   }
 
-  _salvarPublicacao() async {
+  _salvarNovaPublicacao() async {
+    _abrirDialog(_dialogContext);
 
-    //adicionando o id do usuário
+    await _uploadImagens();
+
     Cliente cliente = new Cliente();
     cliente.id = _idUsuarioLogado;
-    cliente.nome  = _nomeUsuario;
+    cliente.nome = _nomeUsuario;
 
-    Publicacao publicacao = new Publicacao.empty();
-    publicacao.descricao= _tituloController.text;
-    publicacao.dataPublicacao = _format.format(DateTime.now()).toString();
-    publicacao.time = DateTime.now().toUtc();
-    publicacao.image = _urlRecuperada;
-    publicacao.loja = new Loja("10", _lojaController.text, "16 3987 4540", "Habib Jabali 1500");
-    publicacao.cliente = cliente;
-    publicacao.precoProduto = _precoController.text;
-    publicacao.produto = new Produto("02", "Arroz tipo 1 5Kg");
+    _publicacao.cliente = cliente;
+    _publicacao.time = Timestamp.now();
+    _publicacao.dataPublicacao = _format.format(DateTime.now()).toString();
 
-    Firestore db = Firestore.instance;
-
-    await db.collection("publicacoes")
-        .document( _idUsuarioLogado )
+    await db
+        .collection("publicacoes")
+        .document(_idUsuarioLogado)
         .collection("publicacao")
-        .add(publicacao.toMap());
+        .add(_publicacao.toMap());
 
-    Navigator.pushReplacementNamed(context, "/home");
-  }
-
-  _recuperarUrlImagem(StorageTaskSnapshot snapshot) async{
-    String url = await snapshot.ref.getDownloadURL();
-    setState(() {
-      _urlRecuperada = url;
-    });
+    Navigator.pop(_dialogContext);
+    Navigator.pop(context);
   }
 
   _recuperarUsuarioLogado() async{
@@ -266,21 +320,6 @@ class _NovaPublicacaoState extends State<NovaPublicacao> {
     _recuperarNomeUsuario();
   }
 
-  _recuperaQuantidadePublicada() async{
-    var stream = db.collection("publicacoes").document(_idUsuarioLogado).collection("publicacao");
-    var snapShot = await stream.getDocuments();
-    print(snapShot.documents.length);
-    if(snapShot.documents.length == null){
-      setState(() {
-        _totalPublicado = "0";
-      });
-    }else{
-      setState(() {
-        _totalPublicado = snapShot.documents.length.toString();
-      });
-    }
-  }
-
   _recuperarNomeUsuario()async{
      db.collection("usuarios").document(_idUsuarioLogado).get().then((documento){
        var doc = documento['nome'];
@@ -291,54 +330,41 @@ class _NovaPublicacaoState extends State<NovaPublicacao> {
      });
   }
 
-  Future _uploadImagem() async{
+  Future _selecionarImagemGaleria() async {
+    final _piker = ImagePicker();
+    File _image;
 
-    await _recuperaQuantidadePublicada();
-
-    FirebaseStorage storage = FirebaseStorage.instance;
-    StorageReference pastaRaiz = storage.ref();
-    String nomeImagem = _idUsuarioLogado+"_"+_totalPublicado+".jpg";
-    StorageReference arquivo = pastaRaiz.child("publicacoes").child(nomeImagem);
-    //Progresso da imagem sendo enviada ao servidor
-    StorageUploadTask task = arquivo.putFile(_imagem);
-
-    task.events.listen((StorageTaskEvent storageEvent){
-      if(storageEvent.type == StorageTaskEventType.progress){
-        setState(() {
-          _subindoImagem = true;
-        });
-      }else if(storageEvent.type == StorageTaskEventType.success){
-        setState(() {
-          _subindoImagem = false;
-        });
-      }
+    final imagemSelecionada =
+    await _piker.getImage(source: ImageSource.gallery);
+    setState(() {
+      _image = File(imagemSelecionada.path);
     });
-    //Recuperar imagem
-    task.onComplete.then((StorageTaskSnapshot snapshot){
-      _recuperarUrlImagem(snapshot);
-    });
+
+    print(_image);
+    if (_image != null) {
+      setState(() {
+        _listImagens.add(_image);
+      });
+    }
   }
 
-  Future _recuperarImagem(String origem) async{
-    File imagemSelecionada;
-    final piker = ImagePicker();
-    switch (origem) {
-      case "camera":
-        final pikedImageCamera = await piker.getImage(source: ImageSource.camera,maxHeight: 480, maxWidth: 640);
-        imagemSelecionada = File(pikedImageCamera.path);
-        break;
-      case "galeria":
-        final pikedImageGallery = await piker.getImage(source: ImageSource.gallery, );
-        imagemSelecionada = File(pikedImageGallery.path);
-        break;
-    }
-    setState(() {
-      _imagem = imagemSelecionada;
-      if(_imagem != null){
-        _subindoImagem = true;
-        _uploadImagem();
-      }
-    });
+  _abrirDialog(BuildContext context){
+    showDialog(
+        context: context,
+        barrierDismissible: false,
+        builder: (BuildContext context){
+          return AlertDialog(
+            content: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: <Widget>[
+                CircularProgressIndicator(),
+                SizedBox(height: 20,),
+                Text("Salvando anúncio...")
+              ],
+            ),
+          );
+        }
+    );
   }
 
 }

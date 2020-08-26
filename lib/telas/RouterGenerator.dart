@@ -4,9 +4,13 @@ import 'package:compareapp/telas/Login.dart';
 import 'package:compareapp/telas/NovaPublicacao.dart';
 import 'package:flutter/material.dart';
 
+import 'DetalhesPublicacao.dart';
+
 class RouterGenerator{
 
   static Route<dynamic> generateRoute(RouteSettings settings){
+
+    final args = settings.arguments;
 
     switch(settings.name){
 
@@ -43,6 +47,11 @@ class RouterGenerator{
       case "/dadosUsuario":
         return MaterialPageRoute(
             builder: (_) => CadastroUsuario()
+        );
+
+      case "/detalhes-publicacao":
+        return MaterialPageRoute(
+            builder: (_) => DetalhesPublicacao(args)
         );
 
       default:

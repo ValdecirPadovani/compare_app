@@ -1,5 +1,4 @@
-import 'package:compareapp/Utils/ListPublicacao.dart';
-import 'package:compareapp/model/Publicacao.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:compareapp/telas/Destaques.dart';
 import 'package:compareapp/telas/Inicio.dart';
 import 'package:compareapp/telas/Publicacoes.dart';
@@ -15,14 +14,22 @@ class Home extends StatefulWidget {
 class _HomeState extends State<Home> {
 
   int _indice = 0;
-
-  List<Publicacao> publicacoes = ListPublicacao.listaPublicacao();
+  String _accountName;
+  String _accountEmail;
+  String _urlImage;
+  Firestore db = Firestore.instance;
 
   List<Widget> _telas = [
     Inicio(),
     Publicacoes(),
     Destaques()
   ];
+
+  @override
+  void initState() {
+    _recuperarNomeUsuario();
+    super.initState();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -77,30 +84,49 @@ class _HomeState extends State<Home> {
     Navigator.pushReplacementNamed(context,"/login");
   }
 
+  _recuperarNomeUsuario() async {
+
+    FirebaseAuth auth = FirebaseAuth.instance;
+    FirebaseUser usuarioLogado = await auth.currentUser();
+
+    await db.collection("usuarios").document(usuarioLogado.uid).get().then((documento){
+      var doc = documento['nome'];
+      var docEmail = documento['email'];
+      var urlImage = documento['urlImage'];
+      assert(doc is String);
+      setState(() {
+        _accountName = doc;
+        _accountEmail = docEmail;
+        _urlImage = urlImage;
+      });
+    });
+  }
+
   _dadosUsuario(){
     Navigator.pushNamed(context, "/dadosUsuario");
   }
+
   Widget _myDrawer(){
     return Drawer(
       child: Column(
         children: <Widget>[
           UserAccountsDrawerHeader(
-            accountName: Text("Valdecir Padovani Junior"),
-            accountEmail: Text("valdecir@gmail.com"),
+            accountName: Text(_accountName.toString()),
+            accountEmail: Text(_accountEmail.toString()),
             currentAccountPicture: CircleAvatar(
               backgroundColor: Colors.white30,
-              backgroundImage: Image.asset("images/login.png").image,
+              backgroundImage: _urlImage != null ? NetworkImage(_urlImage) : Image.asset("usuario.png").image ,
             ),
             decoration: BoxDecoration(
-              color: Colors.deepOrangeAccent
+                color: Colors.deepOrangeAccent
             ),
           ),
           SizedBox(height: 40),
           ListTile(
             leading: Icon(Icons.account_box),
             title: Text(
-                "Minha conta",
-                style: TextStyle(fontSize: 20),
+              "Minha conta",
+              style: TextStyle(fontSize: 20),
             ),
             onTap: (){
               _dadosUsuario();

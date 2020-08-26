@@ -1,36 +1,59 @@
 
+import 'package:cloud_firestore/cloud_firestore.dart';
+
 import 'Cliente.dart';
 import 'Loja.dart';
 import 'Produto.dart';
 
 class Publicacao{
 
-  String    _id;
-  String    _descricao;
-  String    _image;
-  Loja      _loja;
-  Produto   _produto;
-  Cliente   _cliente;
-  DateTime  _time;
-  String    _precoProduto;
-  String    _dataPublicacao;
+  String          _id;
+  String          _descricao;
+  List<String>    _image;
+  //ToDo: Voltar para objeto loja depois de implantado
+  //Loja            _loja;
+  String            _loja;
+  Produto         _produto;
+  Cliente         _cliente;
+  String          _nomeCliente;
+  Timestamp        _time;
+  String          _precoProduto;
+  String          _dataPublicacao;
+  String          _categoria;
 
-
-  Publicacao(this._id, this._descricao, this._loja, this._produto,
-      this._cliente,this._image, this._time, this._dataPublicacao);
 
   Publicacao.empty();
 
+  Publicacao.gerarId(){
+    Firestore db = Firestore.instance;
+    CollectionReference publicacao = db.collection("publicacoes");
+    this.id = publicacao.document().documentID;
+    this.image = [];
+  }
+
+  Publicacao.fromDocumentSnapshot(DocumentSnapshot documentSnapshot){
+    this.id             = documentSnapshot.documentID;
+    this.descricao      = documentSnapshot["descricao"];
+    this.image          = List<String>.from(documentSnapshot["image"]);
+    this.loja           = documentSnapshot["lojaId"];
+    this.nomeCliente    = documentSnapshot["clienteId"];
+    this.time           = documentSnapshot["time"];
+    this.precoProduto   = documentSnapshot["precoProduto"];
+    this.dataPublicacao = documentSnapshot["dataPublicacao"];
+    this.categoria      = documentSnapshot["categoria"];
+  }
+
   Map toMap(){
     Map<String, dynamic> map ={
-    "descricao"       : this._descricao,
-    "image"           : this._image,
-    "lojaId"          : this._loja.nome,
-    "produtoId"       : this._produto.nome,
-    "clienteId"       :  this._cliente.nome,
-    "time"            : this._time,
-    "dataPublicacao"  : this.dataPublicacao,
-    "precoProduto"    :this.precoProduto
+      "id"              : this.id,
+      "descricao"       : this._descricao,
+      "image"           : this._image,
+      "lojaId"          : this._loja,
+      "clienteId"       :  this._cliente.nome,
+      "time"            : this._time,
+      "dataPublicacao"  : this.dataPublicacao,
+      "precoProduto"    : this.precoProduto,
+      "categoria"       : this.categoria
     };
 
     if(this._id != null){
@@ -40,16 +63,40 @@ class Publicacao{
   }
 
 
+  String get nomeCliente => _nomeCliente;
+
+  set nomeCliente(String value) {
+    _nomeCliente = value;
+  }
+
+  String get loja => _loja;
+
+  set loja(String value) {
+    _loja = value;
+  }
+
+  String get categoria => _categoria;
+
+  set categoria(String value) {
+    _categoria = value;
+  }
+
+  List<String> get image => _image;
+
+  set image(List<String> value) {
+    _image = value;
+  }
+
   String get dataPublicacao => _dataPublicacao;
 
   set dataPublicacao(String value) {
     _dataPublicacao = value;
   }
 
-  DateTime get time => _time;
+  Timestamp get time => _time;
 
-  set time(DateTime value) {
-    _time = value.toUtc();
+  set time(Timestamp value) {
+    _time = value;
   }
 
   String get precoProduto => _precoProduto;
@@ -58,11 +105,6 @@ class Publicacao{
     _precoProduto = value;
   }
 
-  String get image => _image;
-
-  set image(String value) {
-    _image = value;
-  }
 
   Cliente get cliente => _cliente;
 
@@ -76,11 +118,7 @@ class Publicacao{
     _produto = value;
   }
 
-  Loja get loja => _loja;
 
-  set loja(Loja value) {
-    _loja = value;
-  }
 
   String get descricao => _descricao;
 

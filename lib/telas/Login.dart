@@ -1,8 +1,10 @@
 import 'package:compareapp/model/Cliente.dart';
 import 'package:compareapp/telas/NovoCliente.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+
 
 class Login extends StatefulWidget {
   @override
@@ -47,7 +49,7 @@ class _LoginState extends State<Login> {
   Future _verificarUsuarioLogado() async{
     FirebaseAuth auth = FirebaseAuth.instance;
     //auth.signOut();
-    FirebaseUser usuarioLogado = await auth.currentUser();
+    UserInfo usuarioLogado = await auth.currentUser();
     if(usuarioLogado != null){
       Navigator.pushReplacementNamed(context,"/home");
     }
@@ -104,17 +106,17 @@ class _LoginState extends State<Login> {
                     style: TextStyle(fontSize: 20),
                     controller: _controllerEmail,
                     decoration: InputDecoration(
-                      contentPadding: EdgeInsets.fromLTRB(32, 16, 32, 12),
-                      hintText: "Digite seu e-mail",
-                      labelText: "E-mail" ,
-                      filled: true,
-                      fillColor: Colors.white,
-                      border:  OutlineInputBorder(
-                        borderRadius: BorderRadius.circular(32),
-                        borderSide: BorderSide(
-                          color: Colors.deepOrangeAccent,
+                        contentPadding: EdgeInsets.fromLTRB(32, 16, 32, 12),
+                        hintText: "Digite seu e-mail",
+                        labelText: "E-mail" ,
+                        filled: true,
+                        fillColor: Colors.white,
+                        border:  OutlineInputBorder(
+                            borderRadius: BorderRadius.circular(32),
+                            borderSide: BorderSide(
+                              color: Colors.deepOrangeAccent,
+                            )
                         )
-                      )
                     ),
                   ),
                 ),
@@ -152,44 +154,53 @@ class _LoginState extends State<Login> {
                     },
                   ),
                 ),
-                   RaisedButton(
-                     child: Image(
-                       image: Image.asset("images/login_face.png").image,
-                       height: 50,
-                     ),
-                     color: Colors.blue[900],
-                     padding: EdgeInsets.fromLTRB(32, 6, 32, 6),
-                     shape: RoundedRectangleBorder(
-                       borderRadius: BorderRadius.circular(32),
-                     ),
-                     onPressed: (){
-                       _validarCampos();
-                     },
-                   ),
-                   RaisedButton(
-                     child: Row(
-                       children: <Widget>[
-                         Image(
-                           image: Image.asset("images/gmail2.jpg").image,
-                           height: 50,
-                         ),
-                         Padding(padding: EdgeInsets.only(left: 20)),
-                         Text(
-                           "Entrar com Gmail",
-                           style: TextStyle(color: Colors.red, fontSize: 20),
-                         ),
+                RaisedButton(
+                  child: Row(
+                    children: <Widget>[
+                      Image(
+                        image: Image.asset("images/face2.jpg").image,
+                        height: 20,
+                      ),
+                      Padding(padding: EdgeInsets.only(left: 20)),
+                      Text(
+                        "Entrar com Facebook",
+                        style: TextStyle(color: Colors.white, fontSize: 20),
+                      ),
+                    ],
+                  ),
+                  color: Color(0xFF2A5297),
+                  padding: EdgeInsets.fromLTRB(32, 6, 32, 6),
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(32),
+                  ),
+                  onPressed: (){
+                    _validarCampos();
+                  },
+                ),
+                RaisedButton(
+                  child: Row(
+                    children: <Widget>[
+                      Image(
+                        image: Image.asset("images/login_gmail.png").image,
+                        height: 20,
+                      ),
+                      Padding(padding: EdgeInsets.only(left: 20)),
+                      Text(
+                        "Entrar com Gmail",
+                        style: TextStyle(color: Colors.red, fontSize: 20),
+                      ),
 
-                       ],
-                     ),
-                     color: Colors.white70,
-                     padding: EdgeInsets.fromLTRB(32, 6, 32, 6),
-                     shape: RoundedRectangleBorder(
-                       borderRadius: BorderRadius.circular(32),
-                     ),
-                     onPressed: (){
-                       _validarCampos();
-                     },
-                   ),
+                    ],
+                  ),
+                  color: Colors.white70,
+                  padding: EdgeInsets.fromLTRB(32, 6, 32, 6),
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(32),
+                  ),
+                  onPressed: (){
+                    _validarCampos();
+                  },
+                ),
                 Center(
                   child: GestureDetector(
                     child: Text(
