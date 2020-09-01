@@ -1,5 +1,6 @@
 import 'dart:io';
 
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:compareapp/model/Cliente.dart';
 import 'package:firebase_auth/firebase_auth.dart';
@@ -25,8 +26,8 @@ class _CadastroUsuarioState extends State<CadastroUsuario> {
   String _urlRecuperada;
 
 
-  _recuperarNomeUsuario()async{
-    db.collection("usuarios").document(_idUsuarioLogado).get().then((documento){
+  Future _recuperarNomeUsuario()async{
+    await db.collection("usuarios").document(_idUsuarioLogado).get().then((documento){
       var doc = documento['nome'];
       var docEmail = documento['email'];
       var urlImage = documento['urlImage'];
@@ -39,14 +40,14 @@ class _CadastroUsuarioState extends State<CadastroUsuario> {
     });
   }
 
-  _recuperarUsuarioLogado() async{
+  Future _recuperarUsuarioLogado() async{
     //pegando usuário logado no sistema
     FirebaseAuth auth = FirebaseAuth.instance;
     FirebaseUser usuarioLogado = await auth.currentUser();
     setState(() {
       _idUsuarioLogado = usuarioLogado.uid;
     });
-    _recuperarNomeUsuario();
+    await _recuperarNomeUsuario();
   }
 
   _salvarDadosUsuario() async{
@@ -87,7 +88,18 @@ class _CadastroUsuarioState extends State<CadastroUsuario> {
                 Padding(
                   padding: EdgeInsets.all(12),
                 ),
-                CircleAvatar(
+                CachedNetworkImage(
+                  imageUrl: _urlImage,
+                  placeholder: (context, url) =>
+                  const CircularProgressIndicator(),
+                  imageBuilder: (context, image) => CircleAvatar(
+                    backgroundImage: image,
+                    radius: 150,
+                  ),
+                  errorWidget: (context, url, error) =>
+                  const Icon(Icons.image),
+                ),
+                /*CircleAvatar(
                   backgroundColor: Colors.white30,
                   backgroundImage: _urlImage == null ? Image.asset("images/login.png").image : NetworkImage(_urlImage),
                   radius: 65,
@@ -96,7 +108,7 @@ class _CadastroUsuarioState extends State<CadastroUsuario> {
                       _dialogImage(context);
                     },
                   ),
-                ),
+                ),*/
                 Padding(
                   padding: EdgeInsets.only(top: 10),
                 ),

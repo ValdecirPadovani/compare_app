@@ -1,3 +1,4 @@
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:compareapp/model/Publicacao.dart';
 import 'package:flutter/material.dart';
 
@@ -37,7 +38,15 @@ class ItemAnuncio extends StatelessWidget {
                           crossAxisAlignment: CrossAxisAlignment.stretch,
                           mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                           children: <Widget>[
-                            Image.network(publicacao.image[0],height: 148,width: 150,fit: BoxFit.fill,),
+                            CachedNetworkImage(
+                              imageUrl: publicacao.image[0],
+                              height: 148,
+                              width: 150,
+                              fit: BoxFit.fill,
+                              progressIndicatorBuilder: (context, url, downloadProgress) =>
+                                  CircularProgressIndicator(value: downloadProgress.progress),
+                              errorWidget: (context, url, error) => Icon(Icons.error),
+                            ),
                           ],
                         ),
                       ),

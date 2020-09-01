@@ -1,3 +1,4 @@
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:carousel_pro/carousel_pro.dart';
 import 'package:compareapp/model/Publicacao.dart';
 import 'package:flutter/cupertino.dart';
@@ -21,12 +22,21 @@ class _DetalhesPublicacaoState extends State<DetalhesPublicacao> {
     return listaUrlImagens.map((url) {
       return Container(
         height: 240,
-        decoration: BoxDecoration(
+       /* decoration: BoxDecoration(
             image: DecorationImage(
                 image: NetworkImage(url),
                 fit: BoxFit.fitHeight
             )
-        ),
+        ),*/
+       child: CachedNetworkImage(
+         imageUrl: url,
+         height: 148,
+         width: 150,
+         fit: BoxFit.fitHeight,
+         progressIndicatorBuilder: (context, url, downloadProgress) =>
+             CircularProgressIndicator(value: downloadProgress.progress),
+         errorWidget: (context, url, error) => Icon(Icons.error),
+       ),
       );
     }).toList();
   }
