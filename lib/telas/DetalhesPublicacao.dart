@@ -5,7 +5,6 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 
 class DetalhesPublicacao extends StatefulWidget {
-
   Publicacao publicacao;
   DetalhesPublicacao(this.publicacao);
 
@@ -14,29 +13,22 @@ class DetalhesPublicacao extends StatefulWidget {
 }
 
 class _DetalhesPublicacaoState extends State<DetalhesPublicacao> {
-
   Publicacao _publicacao;
 
-  List<Widget> _getListaImagens(){
+  List<Widget> _getListaImagens() {
     List<String> listaUrlImagens = _publicacao.image;
     return listaUrlImagens.map((url) {
       return Container(
         height: 240,
-       /* decoration: BoxDecoration(
-            image: DecorationImage(
-                image: NetworkImage(url),
-                fit: BoxFit.fitHeight
-            )
-        ),*/
-       child: CachedNetworkImage(
-         imageUrl: url,
-         height: 148,
-         width: 150,
-         fit: BoxFit.fitHeight,
-         progressIndicatorBuilder: (context, url, downloadProgress) =>
-             CircularProgressIndicator(value: downloadProgress.progress),
-         errorWidget: (context, url, error) => Icon(Icons.error),
-       ),
+        child: CachedNetworkImage(
+          imageUrl: url,
+          height: 148,
+          width: 150,
+          fit: BoxFit.fitHeight,
+          progressIndicatorBuilder: (context, url, downloadProgress) =>
+              CircularProgressIndicator(value: downloadProgress.progress),
+          errorWidget: (context, url, error) => Icon(Icons.error),
+        ),
       );
     }).toList();
   }
@@ -79,12 +71,14 @@ class _DetalhesPublicacaoState extends State<DetalhesPublicacao> {
                       IconButton(
                         icon: Icon(Icons.favorite),
                       ),
-                      Text("Gostei", style: TextStyle(
-                        fontSize: 10,
-                        color: Colors.grey,
-                        fontWeight: FontWeight.bold,
-
-                      ),)
+                      Text(
+                        "Gostei",
+                        style: TextStyle(
+                          fontSize: 10,
+                          color: Colors.grey,
+                          fontWeight: FontWeight.bold,
+                        ),
+                      )
                     ],
                   ),
                   Padding(
@@ -98,12 +92,14 @@ class _DetalhesPublicacaoState extends State<DetalhesPublicacao> {
                         //padding: EdgeInsets.only(right: 10),
                         icon: Icon(Icons.share),
                       ),
-                      Text("Compartilhar", style: TextStyle(
-                        fontSize: 10,
-                        color: Colors.grey,
-                        fontWeight: FontWeight.bold,
-
-                      ),)
+                      Text(
+                        "Compartilhar",
+                        style: TextStyle(
+                          fontSize: 10,
+                          color: Colors.grey,
+                          fontWeight: FontWeight.bold,
+                        ),
+                      )
                     ],
                   ),
                   Padding(
@@ -116,12 +112,14 @@ class _DetalhesPublicacaoState extends State<DetalhesPublicacao> {
                       IconButton(
                         icon: Icon(Icons.notifications_active),
                       ),
-                      Text("Criar Alerta", style: TextStyle(
-                        fontSize: 10,
-                        color: Colors.grey,
-                        fontWeight: FontWeight.bold,
-
-                      ),)
+                      Text(
+                        "Criar Alerta",
+                        style: TextStyle(
+                          fontSize: 10,
+                          color: Colors.grey,
+                          fontWeight: FontWeight.bold,
+                        ),
+                      )
                     ],
                   ),
                   Padding(
@@ -134,12 +132,14 @@ class _DetalhesPublicacaoState extends State<DetalhesPublicacao> {
                       IconButton(
                         icon: Icon(Icons.thumb_down),
                       ),
-                      Text("Denunciar", style: TextStyle(
-                        fontSize: 10,
-                        color: Colors.grey,
-                        fontWeight: FontWeight.bold,
-
-                      ),)
+                      Text(
+                        "Denunciar",
+                        style: TextStyle(
+                          fontSize: 10,
+                          color: Colors.grey,
+                          fontWeight: FontWeight.bold,
+                        ),
+                      )
                     ],
                   )
                 ],
@@ -149,14 +149,15 @@ class _DetalhesPublicacaoState extends State<DetalhesPublicacao> {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: <Widget>[
-                    Text("R\$ ${_publicacao.precoProduto}",
+                    Text(
+                      "R\$ ${_publicacao.precoProduto}",
                       style: TextStyle(
                           fontSize: 32,
                           fontWeight: FontWeight.bold,
-                          color: Colors.deepOrangeAccent
-                      ),
+                          color: Colors.deepOrangeAccent),
                     ),
-                    Text("${_publicacao.descricao}",
+                    Text(
+                      "${_publicacao.descricao}",
                       style: TextStyle(
                         fontSize: 25,
                         fontWeight: FontWeight.w400,
@@ -166,7 +167,8 @@ class _DetalhesPublicacaoState extends State<DetalhesPublicacao> {
                       padding: EdgeInsets.symmetric(vertical: 16),
                       child: Divider(),
                     ),
-                    Text("Loja",
+                    Text(
+                      "Loja",
                       style: TextStyle(
                         fontSize: 18,
                         fontWeight: FontWeight.bold,
@@ -174,13 +176,15 @@ class _DetalhesPublicacaoState extends State<DetalhesPublicacao> {
                     ),
                     Padding(
                       padding: EdgeInsets.only(bottom: 16),
-                      child: Text("${_publicacao.loja}",
+                      child: Text(
+                        "${_publicacao.loja}",
                         style: TextStyle(
                           fontSize: 18,
                         ),
                       ),
                     ),
-                    Text("Publicado por:",
+                    Text(
+                      "Publicado por:",
                       style: TextStyle(
                         fontSize: 18,
                         fontWeight: FontWeight.bold,
@@ -188,23 +192,20 @@ class _DetalhesPublicacaoState extends State<DetalhesPublicacao> {
                     ),
                     Padding(
                       padding: EdgeInsets.only(bottom: 16),
-                      child: Text("${_publicacao.nomeCliente}",
+                      child: Text(
+                        "${_publicacao.nomeCliente}",
                         style: TextStyle(
                           fontSize: 18,
                         ),
                       ),
                     )
-
                   ],
                 ),
               ),
-
             ],
           ),
         ],
       ),
-
-
     );
   }
 }

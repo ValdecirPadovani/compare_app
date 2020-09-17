@@ -60,18 +60,8 @@ flutter:
   #  - images/a_dot_ham.jpeg
   assets:
    - images/compare.png
-   - images/arroz.png
-   - images/cerveja.png
-   - images/sabao.png
-   - images/sub.png
-   - images/contra.png
-   - images/login.png
-   - images/promocao.png
    - images/usuario.png
    - images/login_gmail.png
-   - images/gmail.png
-   - images/gmail2.jpg
-   - images/login_face.png
    - images/face2.jpg
 
   # An image asset can refer to one or more resolution-specific "variants", see
