@@ -13,18 +13,18 @@ class Publicacoes extends StatefulWidget {
 
 class _PublicacoesState extends State<Publicacoes> {
   final _controller = StreamController<QuerySnapshot>.broadcast();
-  String _idUsuarioLogado;
-  Firestore db = Firestore.instance;
+  String? _idUsuarioLogado;
+  FirebaseFirestore db = FirebaseFirestore.instance;
 
   Stream<QuerySnapshot> _adicionarListenerConversas() {
-    final stream = db
+     final stream = db
         .collection("publicacoes")
-        .document(_idUsuarioLogado)
+        .doc(_idUsuarioLogado)
         .collection("publicacao")
         .orderBy("time", descending: true)
         .snapshots();
 
-    stream.listen((dados) {
+     throw stream.listen((dados) {
       _controller.add(dados);
     });
   }
@@ -32,9 +32,9 @@ class _PublicacoesState extends State<Publicacoes> {
   _recuperarUsuarioLogado() async {
     //pegando usuário logado no sistema
     FirebaseAuth auth = FirebaseAuth.instance;
-    FirebaseUser usuarioLogado = await auth.currentUser();
+    User? usuarioLogado = await auth.currentUser;
     setState(() {
-      _idUsuarioLogado = usuarioLogado.uid;
+      _idUsuarioLogado = usuarioLogado!.uid;
     });
     _adicionarListenerConversas();
   }
@@ -66,20 +66,20 @@ class _PublicacoesState extends State<Publicacoes> {
               break;
             case ConnectionState.active:
             case ConnectionState.done:
-              QuerySnapshot querySnapshot = snapshot.data;
-              if (querySnapshot.documents.length == 0) {}
+              QuerySnapshot querySnapshot = snapshot.data!;
+              if (querySnapshot.docs.length == 0) {}
               if (snapshot.hasError) {
                 return Expanded(
                   child: Text("Erro ao carregar os dados!"),
                 );
               } else {
                 return ListView.separated(
-                  itemCount: querySnapshot.documents.length,
+                  itemCount: querySnapshot.docs.length,
                   itemBuilder: (context, index) {
                     //Publicacao publicacao = publicacoes[index];
 
                     List<DocumentSnapshot> publicacoes =
-                    querySnapshot.documents.toList();
+                    querySnapshot.docs.toList();
                     DocumentSnapshot documentSnapshot = publicacoes[index];
                     Publicacao publicacao =
                     Publicacao.fromDocumentSnapshot(documentSnapshot);

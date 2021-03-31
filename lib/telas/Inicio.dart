@@ -5,8 +5,6 @@ import 'package:compareapp/model/Publicacao.dart';
 import 'package:compareapp/telas/widgets/ItemAnuncio.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
-import 'package:intl/date_symbol_data_file.dart';
-import 'package:intl/intl.dart';
 
 class Inicio extends StatefulWidget {
   @override
@@ -15,13 +13,13 @@ class Inicio extends StatefulWidget {
 
 class _InicioState extends State<Inicio> {
   final _controller = StreamController<QuerySnapshot>.broadcast();
-  String _idUsuarioLogado;
-  Firestore db = Firestore.instance;
+  String? _idUsuarioLogado;
+  FirebaseFirestore db = FirebaseFirestore.instance;
   static const locale = 'pr_BR';
 
-  Future<Stream<QuerySnapshot>> _adicionarListenerConversas(){
+  Future<Stream<QuerySnapshot?>?> _adicionarListenerConversas(){
     final stream = db.collectionGroup("publicacao").orderBy('time', descending: true).snapshots();
-    stream.listen(
+     throw stream.listen(
             (dados){_controller.add(dados);
         });
   }
@@ -29,9 +27,9 @@ class _InicioState extends State<Inicio> {
   _recuperarUsuarioLogado() async {
     //pegando usuário logado no sistema
     FirebaseAuth auth = FirebaseAuth.instance;
-    FirebaseUser usuarioLogado = await auth.currentUser();
+    User? usuarioLogado = await auth.currentUser;
     setState(() {
-      _idUsuarioLogado = usuarioLogado.uid;
+      _idUsuarioLogado = usuarioLogado!.uid;
     });
     _adicionarListenerConversas();
   }
@@ -64,20 +62,20 @@ class _InicioState extends State<Inicio> {
               break;
             case ConnectionState.active:
             case ConnectionState.done:
-              QuerySnapshot querySnapshot = snapshot.data;
-              if (querySnapshot.documents.length == 0) {}
+              QuerySnapshot querySnapshot = snapshot.data!;
+              if (querySnapshot.docs.length == 0) {}
               if (snapshot.hasError) {
                 return Expanded(
                   child: Text("Erro ao carregar os dados!"),
                 );
               } else {
                 return ListView.separated(
-                  itemCount: querySnapshot.documents.length,
+                  itemCount: querySnapshot.docs.length,
                   itemBuilder: (context, index) {
                     //Publicacao publicacao = publicacoes[index];
 
                     List<DocumentSnapshot> publicacoes =
-                        querySnapshot.documents.toList();
+                        querySnapshot.docs.toList();
                     DocumentSnapshot documentSnapshot = publicacoes[index];
                     Publicacao publicacao =
                         Publicacao.fromDocumentSnapshot(documentSnapshot);

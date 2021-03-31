@@ -4,10 +4,10 @@ class BotaoCustomizado extends StatelessWidget {
 
   final String texto;
   final Color corTexto;
-  final VoidCallback onPressed;
+  final VoidCallback? onPressed;
 
   BotaoCustomizado({
-    @required this.texto,
+    required this.texto,
     this.corTexto = Colors.white,
     this.onPressed
   });

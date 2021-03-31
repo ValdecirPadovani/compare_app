@@ -1,6 +1,6 @@
+import 'dart:async';
 import 'dart:io';
 
-import 'package:cached_network_image/cached_network_image.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:compareapp/model/Cliente.dart';
 import 'package:firebase_auth/firebase_auth.dart';
@@ -15,19 +15,19 @@ class CadastroUsuario extends StatefulWidget {
 
 class _CadastroUsuarioState extends State<CadastroUsuario> {
 
-  Firestore db = Firestore.instance;
+  FirebaseFirestore db = FirebaseFirestore.instance;
   TextEditingController _nomeController = TextEditingController();
   TextEditingController _emailController = TextEditingController();
-  String _urlImage;
+  String? _urlImage;
   String _idUsuarioLogado = "";
-  File _imagem;
-  bool _subindoImagem;
-  String _totalPublicado;
-  String _urlRecuperada;
+  File? _imagem;
+  bool? _subindoImagem;
+  late String _totalPublicado;
+  String? _urlRecuperada;
 
 
   Future _recuperarNomeUsuario()async{
-    await db.collection("usuarios").document(_idUsuarioLogado).get().then((documento){
+    await db.collection("usuarios").doc(_idUsuarioLogado).get().then((documento){
       var doc = documento['nome'];
       var docEmail = documento['email'];
       var urlImage = documento['urlImage'];
@@ -43,9 +43,9 @@ class _CadastroUsuarioState extends State<CadastroUsuario> {
   Future _recuperarUsuarioLogado() async{
     //pegando usuário logado no sistema
     FirebaseAuth auth = FirebaseAuth.instance;
-    FirebaseUser usuarioLogado = await auth.currentUser();
+    User? usuarioLogado = await auth.currentUser;
     setState(() {
-      _idUsuarioLogado = usuarioLogado.uid;
+      _idUsuarioLogado = usuarioLogado!.uid;
     });
     await _recuperarNomeUsuario();
   }
@@ -55,7 +55,7 @@ class _CadastroUsuarioState extends State<CadastroUsuario> {
     cli.nome = _nomeController.text;
     cli.email = _emailController.text;
     cli.urlImage = _urlImage;
-    await db.collection("usuarios").document(_idUsuarioLogado).updateData(cli.toMap());
+    await db.collection("usuarios").doc(_idUsuarioLogado).update(cli.toMap());
     Navigator.pushNamedAndRemoveUntil(context, "/home", (_) => false);
   }
 
@@ -64,7 +64,7 @@ class _CadastroUsuarioState extends State<CadastroUsuario> {
     cli.nome = _nomeController.text;
     cli.email = _emailController.text;
     cli.urlImage = _urlImage;
-    await db.collection("usuarios").document(_idUsuarioLogado).updateData(cli.toMap());
+    await db.collection("usuarios").doc(_idUsuarioLogado).update(cli.toMap());
   }
 
   @override
@@ -88,7 +88,7 @@ class _CadastroUsuarioState extends State<CadastroUsuario> {
                 Padding(
                   padding: EdgeInsets.all(12),
                 ),
-                CachedNetworkImage(
+                /*CachedNetworkImage(
                   imageUrl: _urlImage,
                   placeholder: (context, url) =>
                   const CircularProgressIndicator(),
@@ -98,17 +98,17 @@ class _CadastroUsuarioState extends State<CadastroUsuario> {
                   ),
                   errorWidget: (context, url, error) =>
                   const Icon(Icons.image),
-                ),
-                /*CircleAvatar(
+                )*/
+                CircleAvatar(
                   backgroundColor: Colors.white30,
-                  backgroundImage: _urlImage == null ? Image.asset("images/login.png").image : NetworkImage(_urlImage),
+                  backgroundImage: _urlImage == null ? Image.asset("images/login.png").image : NetworkImage(_urlImage!),
                   radius: 65,
                   child: GestureDetector(
                     onTap: (){
                       _dialogImage(context);
                     },
                   ),
-                ),*/
+                ),
                 Padding(
                   padding: EdgeInsets.only(top: 10),
                 ),
@@ -208,15 +208,15 @@ class _CadastroUsuarioState extends State<CadastroUsuario> {
   }
 
   Future _recuperarImagem(String origem) async {
-    File imagemSelecionada;
+    File? imagemSelecionada;
     final piker = ImagePicker();
     switch (origem) {
       case "camera":
-        final pikedImageCamera = await piker.getImage(source: ImageSource.camera);
+        final pikedImageCamera = await (piker.getImage(source: ImageSource.camera) as FutureOr<PickedFile>);
         imagemSelecionada = File(pikedImageCamera.path);
         break;
       case "galeria":
-        final pikedImageGallery = await piker.getImage(source: ImageSource.gallery);
+        final pikedImageGallery = await (piker.getImage(source: ImageSource.gallery) as FutureOr<PickedFile>);
         imagemSelecionada = File(pikedImageGallery.path);
         break;
     }
@@ -234,31 +234,31 @@ class _CadastroUsuarioState extends State<CadastroUsuario> {
     await _recuperaQuantidadePublicada();
 
     FirebaseStorage storage = FirebaseStorage.instance;
-    StorageReference pastaRaiz = storage.ref();
+    Reference pastaRaiz = storage.ref();
     String nomeImagem = _idUsuarioLogado+"_"+_totalPublicado+ DateTime.now().millisecondsSinceEpoch.toString()+".jpg";
-    StorageReference arquivo = pastaRaiz.child("usuarios").child(nomeImagem);
+    Reference arquivo = pastaRaiz.child("usuarios").child(nomeImagem);
     //Progresso da imagem sendo enviada ao servidor
-    print(_imagem.path + " " + nomeImagem);
-    StorageUploadTask task = arquivo.putFile(_imagem);
+    print(_imagem!.path + " " + nomeImagem);
+    UploadTask task = arquivo.putFile(_imagem!);
 
-    task.events.listen((StorageTaskEvent storageEvent){
-      if(storageEvent.type == StorageTaskEventType.progress){
+    task.snapshotEvents.listen((TaskSnapshot storageEvent){
+      if(storageEvent.state ==  TaskState.success){
         setState(() {
           _subindoImagem = true;
         });
-      }else if(storageEvent.type == StorageTaskEventType.success){
+      }else if(storageEvent.state == TaskState.success){
         setState(() {
           _subindoImagem = false;
         });
       }
     });
     //Recuperar imagem
-    task.onComplete.then((StorageTaskSnapshot snapshot){
+    task.then((TaskSnapshot snapshot){
       _recuperarUrlImagem(snapshot);
     });
   }
 
-  _recuperarUrlImagem(StorageTaskSnapshot snapshot) async{
+  _recuperarUrlImagem(TaskSnapshot snapshot) async{
     String url = await snapshot.ref.getDownloadURL();
     setState(() {
       _urlImage = url;
@@ -267,16 +267,16 @@ class _CadastroUsuarioState extends State<CadastroUsuario> {
   }
 
   _recuperaQuantidadePublicada() async{
-    var stream = db.collection("publicacoes").document(_idUsuarioLogado).collection("publicacao");
-    var snapShot = await stream.getDocuments();
-    print(snapShot.documents.length);
-    if(snapShot.documents.length == null){
+    var stream = db.collection("publicacoes").doc(_idUsuarioLogado).collection("publicacao");
+    var snapShot = await stream.get();
+    print(snapShot.docs.length);
+    if(snapShot.docs.length == null){
       setState(() {
         _totalPublicado = "0";
       });
     }else{
       setState(() {
-        _totalPublicado = snapShot.documents.length.toString();
+        _totalPublicado = snapShot.docs.length.toString();
       });
     }
   }

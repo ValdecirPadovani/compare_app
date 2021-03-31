@@ -1,11 +1,10 @@
-import 'package:cached_network_image/cached_network_image.dart';
-import 'package:carousel_pro/carousel_pro.dart';
+//import 'package:carousel_pro/carousel_pro.dart';
 import 'package:compareapp/model/Publicacao.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 
 class DetalhesPublicacao extends StatefulWidget {
-  Publicacao publicacao;
+  Publicacao? publicacao;
   DetalhesPublicacao(this.publicacao);
 
   @override
@@ -13,14 +12,14 @@ class DetalhesPublicacao extends StatefulWidget {
 }
 
 class _DetalhesPublicacaoState extends State<DetalhesPublicacao> {
-  Publicacao _publicacao;
+  Publicacao? _publicacao;
 
   List<Widget> _getListaImagens() {
-    List<String> listaUrlImagens = _publicacao.image;
+    List<String> listaUrlImagens = _publicacao!.image!;
     return listaUrlImagens.map((url) {
       return Container(
         height: 240,
-        child: CachedNetworkImage(
+        child: Text("Teste")/*CachedNetworkImage(
           imageUrl: url,
           height: 148,
           width: 150,
@@ -28,7 +27,7 @@ class _DetalhesPublicacaoState extends State<DetalhesPublicacao> {
           progressIndicatorBuilder: (context, url, downloadProgress) =>
               CircularProgressIndicator(value: downloadProgress.progress),
           errorWidget: (context, url, error) => Icon(Icons.error),
-        ),
+        )*/,
       );
     }).toList();
   }
@@ -52,14 +51,14 @@ class _DetalhesPublicacaoState extends State<DetalhesPublicacao> {
             children: <Widget>[
               SizedBox(
                 height: 250,
-                child: Carousel(
+                child: Text("Teste") /*Carousel(
                   images: _getListaImagens(),
                   dotSize: 8,
                   dotBgColor: Colors.transparent,
                   dotColor: Colors.white,
                   autoplay: false,
                   dotIncreasedColor: Colors.deepOrangeAccent,
-                ),
+                )*/,
               ),
               Row(
                 mainAxisAlignment: MainAxisAlignment.center,
@@ -69,7 +68,7 @@ class _DetalhesPublicacaoState extends State<DetalhesPublicacao> {
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: <Widget>[
                       IconButton(
-                        icon: Icon(Icons.favorite),
+                        icon: Icon(Icons.favorite), onPressed: () {  },
                       ),
                       Text(
                         "Gostei",
@@ -90,7 +89,7 @@ class _DetalhesPublicacaoState extends State<DetalhesPublicacao> {
                     children: <Widget>[
                       IconButton(
                         //padding: EdgeInsets.only(right: 10),
-                        icon: Icon(Icons.share),
+                        icon: Icon(Icons.share), onPressed: () {  },
                       ),
                       Text(
                         "Compartilhar",
@@ -110,7 +109,7 @@ class _DetalhesPublicacaoState extends State<DetalhesPublicacao> {
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: <Widget>[
                       IconButton(
-                        icon: Icon(Icons.notifications_active),
+                        icon: Icon(Icons.notifications_active), onPressed: () {  },
                       ),
                       Text(
                         "Criar Alerta",
@@ -130,7 +129,7 @@ class _DetalhesPublicacaoState extends State<DetalhesPublicacao> {
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: <Widget>[
                       IconButton(
-                        icon: Icon(Icons.thumb_down),
+                        icon: Icon(Icons.thumb_down), onPressed: () {  },
                       ),
                       Text(
                         "Denunciar",
@@ -150,14 +149,14 @@ class _DetalhesPublicacaoState extends State<DetalhesPublicacao> {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: <Widget>[
                     Text(
-                      "R\$ ${_publicacao.precoProduto}",
+                      "R\$ ${_publicacao!.precoProduto}",
                       style: TextStyle(
                           fontSize: 32,
                           fontWeight: FontWeight.bold,
                           color: Colors.deepOrangeAccent),
                     ),
                     Text(
-                      "${_publicacao.descricao}",
+                      "${_publicacao!.descricao}",
                       style: TextStyle(
                         fontSize: 25,
                         fontWeight: FontWeight.w400,
@@ -177,7 +176,7 @@ class _DetalhesPublicacaoState extends State<DetalhesPublicacao> {
                     Padding(
                       padding: EdgeInsets.only(bottom: 16),
                       child: Text(
-                        "${_publicacao.loja}",
+                        "${_publicacao!.loja}",
                         style: TextStyle(
                           fontSize: 18,
                         ),
@@ -193,7 +192,7 @@ class _DetalhesPublicacaoState extends State<DetalhesPublicacao> {
                     Padding(
                       padding: EdgeInsets.only(bottom: 16),
                       child: Text(
-                        "${_publicacao.nomeCliente}",
+                        "${_publicacao!.nomeCliente}",
                         style: TextStyle(
                           fontSize: 18,
                         ),

@@ -11,10 +11,9 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:flutter_masked_text/flutter_masked_text.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:intl/intl.dart';
-import 'package:validadores/Validador.dart';
+import 'package:form_field_validator/form_field_validator.dart';
 
 
 class NovaPublicacao extends StatefulWidget {
@@ -24,16 +23,20 @@ class NovaPublicacao extends StatefulWidget {
 
 class _NovaPublicacaoState extends State<NovaPublicacao> {
 
-  Firestore db = Firestore.instance;
+  FirebaseFirestore db = FirebaseFirestore.instance;
   String _idUsuarioLogado = "";
-  String _nomeUsuario;
+  String? _nomeUsuario;
   var _format = new DateFormat('d/M/y').add_Hms();
-  BuildContext _dialogContext;
+  late BuildContext _dialogContext;
+  final requiredValidator = RequiredValidator(errorText: 'this field is required');
+  TextEditingController _titulo = TextEditingController();
+  TextEditingController _preco = TextEditingController();
+  TextEditingController _loja = TextEditingController();
 
   //Novas variaveis
-  List<File> _listImagens = List();
+  List<File?> _listImagens = [];
   final _formKey = GlobalKey<FormState>();
-  Publicacao _publicacao;
+  late Publicacao _publicacao;
 
   @override
   void initState() {
@@ -61,7 +64,7 @@ class _NovaPublicacaoState extends State<NovaPublicacao> {
                 FormField<List>(
                   initialValue: _listImagens,
                   validator: (imagens) {
-                    if (imagens.length == 0) {
+                    if (imagens!.length == 0) {
                       return "Necessário uma imagem";
                     }
                     return null;
@@ -119,7 +122,7 @@ class _NovaPublicacaoState extends State<NovaPublicacao> {
                                                   MainAxisSize.min,
                                                   children: <Widget>[
                                                     Image.file(
-                                                        _listImagens[indice]),
+                                                        _listImagens[indice]!),
                                                     FlatButton(
                                                       child: Text("Excluir"),
                                                       textColor: Colors.red,
@@ -139,7 +142,7 @@ class _NovaPublicacaoState extends State<NovaPublicacao> {
                                     child: CircleAvatar(
                                       radius: 50,
                                       backgroundImage:
-                                      FileImage(_listImagens[indice]),
+                                      FileImage(_listImagens[indice]!),
                                       child: Container(
                                         color:
                                         Color.fromRGBO(255, 255, 255, 0.4),
@@ -180,11 +183,9 @@ class _NovaPublicacaoState extends State<NovaPublicacao> {
                       _publicacao.descricao = descricao;
                     },
                     validator: (valor) {
-                      return Validador()
-                          .add(Validar.OBRIGATORIO, msg: "Campo obrigatório")
-                          .maxLength(50, msg: "Máximo de caracteres")
-                          .valido(valor);
+                      return requiredValidator;
                     },
+                    controller: _titulo,
                   ),
                 ),
                 //Preco
@@ -202,10 +203,9 @@ class _NovaPublicacaoState extends State<NovaPublicacao> {
                       _publicacao.precoProduto = preco;
                     },
                     validator: (valor) {
-                      return Validador()
-                          .add(Validar.OBRIGATORIO, msg: "Campo obrigatório")
-                          .valido(valor);
+                      return requiredValidator;
                     },
+                    controller: _preco,
                   ),
                 ),
                 //Loja
@@ -217,14 +217,13 @@ class _NovaPublicacaoState extends State<NovaPublicacao> {
                     onSaved: (loja) {
                       //ToDo: Resolver o problema da loja... Decidir se vai ser usado mapa ou livre pra digitação
                       Loja _loja = new Loja(
-                          "10", loja, "16 3987 4540", "Habib Jabali 1500");
+                          "10", loja!, "16 3987 4540", "Habib Jabali 1500");
                       _publicacao.loja = loja;
                     },
                     validator: (valor) {
-                      return Validador()
-                          .add(Validar.OBRIGATORIO, msg: "Campo obrigatório")
-                          .valido(valor);
+                      return requiredValidator;
                     },
+                    controller: _loja,
                   ),
                 ),
                 //Enviar - Cancelar
@@ -236,8 +235,8 @@ class _NovaPublicacaoState extends State<NovaPublicacao> {
                       BotaoCustomizado(
                         texto: "Enviar",
                         onPressed: () {
-                          if (_formKey.currentState.validate()) {
-                            _formKey.currentState.save();
+                          if (_formKey.currentState!.validate()) {
+                            _formKey.currentState!.save();
 
                             _dialogContext = context;
 
@@ -268,22 +267,22 @@ class _NovaPublicacaoState extends State<NovaPublicacao> {
 
   Future _uploadImagens() async {
     FirebaseStorage storage = FirebaseStorage.instance;
-    StorageReference pastaRaiz = storage.ref();
+    Reference pastaRaiz = storage.ref();
 
     for (var imagem in _listImagens) {
       String nomeImagem = DateTime
           .now()
           .millisecondsSinceEpoch
           .toString();
-      StorageReference arquivo = pastaRaiz
+      Reference arquivo = pastaRaiz
           .child("meus_anuncios")
-          .child(_publicacao.id)
+          .child(_publicacao.id!)
           .child(nomeImagem);
 
-      StorageUploadTask uploadTask = arquivo.putFile(imagem);
-      StorageTaskSnapshot taskSnapshot = await uploadTask.onComplete;
+      UploadTask uploadTask = arquivo.putFile(imagem!);
+      TaskSnapshot taskSnapshot = await uploadTask.snapshot;
       String url = await taskSnapshot.ref.getDownloadURL();
-      _publicacao.image.add(url);
+      _publicacao.image!.add(url);
     }
   }
 
@@ -302,9 +301,9 @@ class _NovaPublicacaoState extends State<NovaPublicacao> {
 
     await db
         .collection("publicacoes")
-        .document(_idUsuarioLogado)
+        .doc(_idUsuarioLogado)
         .collection("publicacao")
-        .add(_publicacao.toMap());
+        .add(_publicacao.toMap() as Map<String, dynamic>);
 
     Navigator.pop(_dialogContext);
     Navigator.pop(context);
@@ -313,15 +312,15 @@ class _NovaPublicacaoState extends State<NovaPublicacao> {
   _recuperarUsuarioLogado() async{
     //pegando usuário logado no sistema
     FirebaseAuth auth = FirebaseAuth.instance;
-    FirebaseUser usuarioLogado = await auth.currentUser();
+    User? usuarioLogado = await auth.currentUser;
     setState(() {
-      _idUsuarioLogado = usuarioLogado.uid;
+      _idUsuarioLogado = usuarioLogado!.uid;
     });
     _recuperarNomeUsuario();
   }
 
   _recuperarNomeUsuario()async{
-     db.collection("usuarios").document(_idUsuarioLogado).get().then((documento){
+     db.collection("usuarios").doc(_idUsuarioLogado).get().then((documento){
        var doc = documento['nome'];
        assert(doc is String);
        setState(() {
@@ -332,12 +331,12 @@ class _NovaPublicacaoState extends State<NovaPublicacao> {
 
   Future _selecionarImagemGaleria() async {
     final _piker = ImagePicker();
-    File _image;
+    File? _image;
 
     final imagemSelecionada =
     await _piker.getImage(source: ImageSource.gallery);
     setState(() {
-      _image = File(imagemSelecionada.path);
+      _image = File(imagemSelecionada!.path);
     });
 
     print(_image);

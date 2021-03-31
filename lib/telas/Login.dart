@@ -49,7 +49,9 @@ class _LoginState extends State<Login> {
   Future _verificarUsuarioLogado() async{
     FirebaseAuth auth = FirebaseAuth.instance;
     //auth.signOut();
-    UserInfo usuarioLogado = await auth.currentUser();
+    User usuarioLogado = await auth.currentUser!;
+    //ToDo: Verificar a exixtencia de erros
+    UserInfo info = usuarioLogado.providerData.first;
     if(usuarioLogado != null){
       Navigator.pushReplacementNamed(context,"/home");
     }
@@ -58,8 +60,8 @@ class _LoginState extends State<Login> {
   _logarUsuario(Cliente cliente) {
     FirebaseAuth auth = FirebaseAuth.instance;
     auth.signInWithEmailAndPassword(
-        email: cliente.email,
-        password: cliente.senha
+        email: cliente.email!,
+        password: cliente.senha!
     ).then((firebase) {
       Navigator.pushReplacementNamed(context,"/home");
     }).catchError((error) {

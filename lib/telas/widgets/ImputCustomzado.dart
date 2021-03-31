@@ -9,15 +9,15 @@ class ImputCustomizado extends StatelessWidget {
   final bool obscure;
   final bool autofocus;
   final TextInputType type;
-  final int maxLines;
-  final List<TextInputFormatter> inputFormatters;
-  final Function(String) validator;
-  final Function(String) onSaved;
+  final int? maxLines;
+  final List<TextInputFormatter>? inputFormatters;
+  final Function(String)? validator;
+  final Function(String?)? onSaved;
 
   ImputCustomizado({
-    @required this.controller,
-    @required this.hint,
-    @required this.label,
+    required this.controller,
+    required this.hint,
+    required this.label,
     this.obscure = false,
     this.autofocus = false,
     this.type = TextInputType.text,
@@ -35,7 +35,7 @@ class ImputCustomizado extends StatelessWidget {
       autofocus: this.autofocus,
       keyboardType: this.type,
       inputFormatters: this.inputFormatters,
-      validator: this.validator,
+      validator: this.validator as String? Function(String?)?,
       maxLines: this.maxLines,
       onSaved: this.onSaved,
       style: TextStyle(fontSize: 20),

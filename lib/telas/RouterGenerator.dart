@@ -1,4 +1,5 @@
 import 'package:compareapp/Home.dart';
+import 'package:compareapp/model/Publicacao.dart';
 import 'package:compareapp/telas/CadastroUsuario.dart';
 import 'package:compareapp/telas/Login.dart';
 import 'package:compareapp/telas/NovaPublicacao.dart';
@@ -51,11 +52,11 @@ class RouterGenerator{
 
       case "/detalhes-publicacao":
         return MaterialPageRoute(
-            builder: (_) => DetalhesPublicacao(args)
+            builder: (_) => DetalhesPublicacao(args as Publicacao?)
         );
 
       default:
-        _erroRota();
+       throw _erroRota();
     }
 
   }

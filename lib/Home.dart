@@ -1,4 +1,3 @@
-import 'package:cached_network_image/cached_network_image.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:compareapp/telas/Destaques.dart';
 import 'package:compareapp/telas/Inicio.dart';
@@ -14,10 +13,10 @@ class Home extends StatefulWidget {
 
 class _HomeState extends State<Home> {
   int _indice = 0;
-  String _accountName;
-  String _accountEmail;
-  String _urlImage;
-  Firestore db = Firestore.instance;
+  String? _accountName;
+  String? _accountEmail;
+  String? _urlImage;
+  FirebaseFirestore db = FirebaseFirestore.instance;
 
   List<Widget> _telas = [Inicio(), Publicacoes(), Destaques()];
 
@@ -55,11 +54,11 @@ class _HomeState extends State<Home> {
         },
         items: [
           BottomNavigationBarItem(
-              title: Text("Inicio"), icon: Icon(Icons.home)),
+              label: "Inicio", icon: Icon(Icons.home)),
           BottomNavigationBarItem(
-              title: Text("Publicações"), icon: Icon(Icons.local_offer)),
+              label: "Publicações", icon: Icon(Icons.local_offer)),
           BottomNavigationBarItem(
-              title: Text("Destaques"), icon: Icon(Icons.grade)),
+              label: "Destaques", icon: Icon(Icons.grade)),
         ],
       ),
     );
@@ -73,11 +72,11 @@ class _HomeState extends State<Home> {
 
   _recuperarNomeUsuario() async {
     FirebaseAuth auth = FirebaseAuth.instance;
-    FirebaseUser usuarioLogado = await auth.currentUser();
+    User usuarioLogado = await auth.currentUser!;
 
     await db
         .collection("usuarios")
-        .document(usuarioLogado.uid)
+        .doc(usuarioLogado.uid)
         .get()
         .then((documento) {
       var doc = documento['nome'];
@@ -104,7 +103,7 @@ class _HomeState extends State<Home> {
               accountName: Text(_accountName.toString()),
               accountEmail: Text(_accountEmail.toString()),
               currentAccountPicture: _urlImage != null
-                  ? CachedNetworkImage(
+                  ? _urlImage as Widget?/*CachedNetworkImage(
                       imageUrl: _urlImage,
                       placeholder: (context, url) =>
                           const CircularProgressIndicator(),
@@ -114,7 +113,7 @@ class _HomeState extends State<Home> {
                       ),
                       errorWidget: (context, url, error) =>
                           const Icon(Icons.image),
-                    )
+                    )*/
                   : Image.asset("usuario.png")),
           SizedBox(height: 40),
           ListTile(

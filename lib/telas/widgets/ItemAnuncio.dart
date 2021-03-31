@@ -1,15 +1,14 @@
-import 'package:cached_network_image/cached_network_image.dart';
 import 'package:compareapp/model/Publicacao.dart';
 import 'package:flutter/material.dart';
 
 class ItemAnuncio extends StatelessWidget {
 
   Publicacao publicacao;
-  VoidCallback onTapItem;
-  VoidCallback onTapRemover;
+  VoidCallback? onTapItem;
+  VoidCallback? onTapRemover;
 
   ItemAnuncio({
-    @required this.publicacao,
+    required this.publicacao,
     this.onTapRemover,
     this.onTapItem
   });
@@ -38,7 +37,8 @@ class ItemAnuncio extends StatelessWidget {
                           crossAxisAlignment: CrossAxisAlignment.stretch,
                           mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                           children: <Widget>[
-                            CachedNetworkImage(
+                          Text("Teste")
+                           /* CachedNetworkImage(
                               imageUrl: publicacao.image[0],
                               height: 148,
                               width: 150,
@@ -46,7 +46,7 @@ class ItemAnuncio extends StatelessWidget {
                               progressIndicatorBuilder: (context, url, downloadProgress) =>
                                   CircularProgressIndicator(value: downloadProgress.progress),
                               errorWidget: (context, url, error) => Icon(Icons.error),
-                            ),
+                            )*/,
                           ],
                         ),
                       ),
@@ -74,7 +74,7 @@ class ItemAnuncio extends StatelessWidget {
                                           ),
                                           Text(
                                             publicacao.precoProduto == null
-                                                ? "Sempre preco" : publicacao.precoProduto,
+                                                ? "Sempre preco" : publicacao.precoProduto!,
                                             style: TextStyle(
                                               fontSize: 16,
                                             ),
@@ -97,7 +97,7 @@ class ItemAnuncio extends StatelessWidget {
                                             color: Colors.deepOrangeAccent,
                                           ),
                                           Text(
-                                            publicacao.dataPublicacao,
+                                            publicacao.dataPublicacao!,
                                             style: TextStyle(
                                               fontSize: 16,
                                             ),
@@ -123,7 +123,7 @@ class ItemAnuncio extends StatelessWidget {
                                           Expanded(
                                             child: Text(
                                               publicacao.loja == null
-                                                  ? "" : publicacao.loja,
+                                                  ? "" : publicacao.loja!,
                                               style: TextStyle(
                                                 fontSize: 16,
                                               ),
@@ -149,7 +149,7 @@ class ItemAnuncio extends StatelessWidget {
                                           Expanded(
                                             child: Text(
                                               publicacao.nomeCliente == null
-                                                  ? "nome" : publicacao.nomeCliente
+                                                  ? "nome" : publicacao.nomeCliente!
                                               ,
                                               style: TextStyle(
                                                 fontSize: 16,
@@ -171,7 +171,7 @@ class ItemAnuncio extends StatelessWidget {
               ),
               ListTile(
                 title: Text(
-                  publicacao.descricao,
+                  publicacao.descricao!,
                   style: TextStyle(
                       fontSize: 18,
                       fontWeight: FontWeight.bold

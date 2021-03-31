@@ -18,13 +18,13 @@ class _NovoClienteState extends State<NovoCliente> {
   _cadastrarUsuario(Cliente cliente) {
     FirebaseAuth auth = FirebaseAuth.instance;
     auth.createUserWithEmailAndPassword(
-        email: cliente.email,
-        password: cliente.senha
+        email: cliente.email!,
+        password: cliente.senha!
     ).then((firebaseUser) {
-      Firestore db = Firestore.instance;
+      FirebaseFirestore db = FirebaseFirestore.instance;
       db.collection("usuarios")
-          .document(firebaseUser.user.uid)
-          .setData(cliente.toMap());
+          .doc(firebaseUser.user!.uid)
+          .set(cliente.toMap());
       Navigator.pushNamedAndRemoveUntil(context, "/home", (_) => false);
     }).catchError((error) {
       setState(() {
@@ -201,7 +201,7 @@ class _NovoClienteState extends State<NovoCliente> {
                         padding: EdgeInsets.fromLTRB(32, 16, 32, 16),
                         shape: RoundedRectangleBorder(
                           borderRadius: BorderRadius.circular(32),
-                        ),
+                        ), onPressed: () {  },
                       ),
                     ],
                   ) ,
