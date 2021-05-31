@@ -17,7 +17,7 @@ class _InicioState extends State<Inicio> {
   FirebaseFirestore db = FirebaseFirestore.instance;
   static const locale = 'pr_BR';
 
-  Future<Stream<QuerySnapshot?>?> _adicionarListenerConversas(){
+  Future<Stream<QuerySnapshot>> _adicionarListenerConversas(){
     final stream = db.collectionGroup("publicacao").orderBy('time', descending: true).snapshots();
      throw stream.listen(
             (dados){_controller.add(dados);

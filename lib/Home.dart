@@ -103,7 +103,7 @@ class _HomeState extends State<Home> {
               accountName: Text(_accountName.toString()),
               accountEmail: Text(_accountEmail.toString()),
               currentAccountPicture: _urlImage != null
-                  ? _urlImage as Widget?/*CachedNetworkImage(
+                  ? CircleAvatar(backgroundImage: NetworkImage(_urlImage!),)/*CachedNetworkImage(
                       imageUrl: _urlImage,
                       placeholder: (context, url) =>
                           const CircularProgressIndicator(),
@@ -115,6 +115,7 @@ class _HomeState extends State<Home> {
                           const Icon(Icons.image),
                     )*/
                   : Image.asset("usuario.png")),
+
           SizedBox(height: 40),
           ListTile(
             leading: Icon(Icons.account_box),
